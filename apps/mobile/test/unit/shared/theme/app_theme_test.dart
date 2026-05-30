@@ -57,20 +57,25 @@ void main() {
     testWidgets('unknown id falls back to canopy', (tester) async {
       final theme = AppTheme.fromId('does-not-exist');
       expect(theme.brightness, Brightness.light);
-      expect(theme.extension<AppColors>()?.amber, const Color(0xFFD97706));
       await drainFonts(tester);
     });
 
-    testWidgets('canopy amber token is amber color', (tester) async {
+    testWidgets('canopy primary is forest green', (tester) async {
       final theme = AppTheme.fromId('canopy');
-      final colors = theme.extension<AppColors>()!;
-      expect(colors.amber, const Color(0xFFD97706));
+      expect(theme.colorScheme.primary, const Color(0xFF2F7D4F));
       await drainFonts(tester);
     });
 
-    testWidgets('scaffold background matches theme background', (tester) async {
+    testWidgets('canopy background is warm cream', (tester) async {
       final theme = AppTheme.fromId('canopy');
-      expect(theme.scaffoldBackgroundColor, const Color(0xFFF7F3EE));
+      expect(theme.scaffoldBackgroundColor, const Color(0xFFF6F4EE));
+      await drainFonts(tester);
+    });
+
+    testWidgets('canopy accent token is forest green', (tester) async {
+      final theme = AppTheme.fromId('canopy');
+      final ac = theme.extension<AppColors>()!;
+      expect(ac.amber, const Color(0xFF2F7D4F)); // "amber" token repurposed as the green accent
       await drainFonts(tester);
     });
   });
