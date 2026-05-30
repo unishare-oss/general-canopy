@@ -52,6 +52,17 @@ firebase deploy --only firestore:rules
 
 Add new `match` blocks above the default-deny rule as you build features.
 
+## Seed sample saplings (one-time per environment)
+
+1. Firebase Console → Project Settings → Service accounts → Generate new private key.
+   Save as `tools/service-account.json` (gitignored).
+2. Install + run:
+   ```bash
+   cd tools && npm install
+   node seed_saplings.js service-account.json
+   ```
+   Seeds ~8 available saplings into the `saplings` collection.
+
 ## 4. Install deps + generate code
 
 ```bash
