@@ -93,21 +93,34 @@ GoRouter router(Ref ref) {
         builder: (context, state, navigationShell) =>
             ShellScaffold(navigationShell: navigationShell),
         branches: [
-          StatefulShellBranch(routes: [
-            GoRoute(path: '/discover', builder: (c, s) => const DiscoverScreen()),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(path: '/map', builder: (c, s) => const MapScreen()),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(path: '/grove', builder: (c, s) => const GroveScreen()),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(path: '/impact', builder: (c, s) => const ImpactScreen()),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(path: '/you', builder: (c, s) => const YouScreen()),
-          ]),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/discover',
+                builder: (c, s) => const DiscoverScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(path: '/map', builder: (c, s) => const MapScreen()),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(path: '/grove', builder: (c, s) => const GroveScreen()),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(path: '/impact', builder: (c, s) => const ImpactScreen()),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(path: '/you', builder: (c, s) => const YouScreen()),
+            ],
+          ),
         ],
       ),
     ],

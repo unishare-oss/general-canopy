@@ -16,14 +16,16 @@ void main() {
   }
 
   group('AppTypography', () {
-    testWidgets('display + headline use a serif (Fraunces); body uses Space Grotesk',
-        (tester) async {
-      final tt = AppTypography.textTheme(const Color(0xFF000000));
-      expect(tt.displayLarge!.fontFamily, contains('Fraunces'));
-      expect(tt.headlineMedium!.fontFamily, contains('Fraunces'));
-      expect(tt.bodyMedium!.fontFamily, contains('SpaceGrotesk'));
-      await drainFonts(tester);
-    });
+    testWidgets(
+      'display + headline use a serif (Fraunces); body uses Space Grotesk',
+      (tester) async {
+        final tt = AppTypography.textTheme(const Color(0xFF000000));
+        expect(tt.displayLarge!.fontFamily, contains('Fraunces'));
+        expect(tt.headlineMedium!.fontFamily, contains('Fraunces'));
+        expect(tt.bodyMedium!.fontFamily, contains('SpaceGrotesk'));
+        await drainFonts(tester);
+      },
+    );
 
     testWidgets('applies the given color to body and display', (tester) async {
       final tt = AppTypography.textTheme(const Color(0xFF112233));

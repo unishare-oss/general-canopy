@@ -32,28 +32,28 @@ abstract class SaplingModel with _$SaplingModel {
       _$SaplingModelFromJson(json);
 
   Sapling toEntity(String id) => Sapling(
-        id: id,
-        nickname: nickname,
-        species: species,
-        latin: latin,
-        personality: personality,
-        street: street,
-        neighborhood: neighborhood,
-        lat: lat,
-        lng: lng,
-        ageLabel: ageLabel,
-        heightLabel: heightLabel,
-        waterNeedLabel: waterNeedLabel,
-        lightLabel: lightLabel,
-        wateringIntervalDays: wateringIntervalDays,
-        colorHex: colorHex,
-        // Unknown/new status strings fall back to `available` on purpose — a
-        // malformed value should never make a tree look adopted/unavailable.
-        status: switch (status) {
-          'adopted' => SaplingStatus.adopted,
-          _ => SaplingStatus.available,
-        },
-        photoUrl: photoUrl,
-        adoptedBy: adoptedBy,
-      );
+    id: id,
+    nickname: nickname,
+    species: species,
+    latin: latin,
+    personality: personality,
+    street: street,
+    neighborhood: neighborhood,
+    lat: lat,
+    lng: lng,
+    ageLabel: ageLabel,
+    heightLabel: heightLabel,
+    waterNeedLabel: waterNeedLabel,
+    lightLabel: lightLabel,
+    wateringIntervalDays: wateringIntervalDays,
+    colorHex: colorHex,
+    // Unknown/new status strings fall back to `available` on purpose — a
+    // malformed value should never make a tree look adopted/unavailable.
+    status: switch (status) {
+      'adopted' => SaplingStatus.adopted,
+      _ => SaplingStatus.available,
+    },
+    photoUrl: photoUrl,
+    adoptedBy: adoptedBy,
+  );
 }

@@ -20,8 +20,10 @@ class AppThemes {
     border: Color(0xFFE2DFD7),
     textSecondary: Color(0xFF4F5751),
     textMuted: Color(0xFF8A8F88),
-    amber: Color(0xFF2F7D4F),       // primary accent token (buttons/active icons), now green
-    amberHover: Color(0xFF1F5A38),  // pressed/hover (primary-deep)
+    amber: Color(
+      0xFF2F7D4F,
+    ), // primary accent token (buttons/active icons), now green
+    amberHover: Color(0xFF1F5A38), // pressed/hover (primary-deep)
     amberSubtle: Color(0xFFE8F3EC), // tinted backgrounds (primary-surface)
     success: Color(0xFF2F9E44),
     info: Color(0xFF2A6EBB),

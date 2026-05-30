@@ -19,25 +19,30 @@ class ShellScaffold extends StatelessWidget {
         ),
         destinations: const [
           NavigationDestination(
-              icon: Icon(Icons.explore_outlined),
-              selectedIcon: Icon(Icons.explore),
-              label: 'Discover'),
+            icon: Icon(Icons.explore_outlined),
+            selectedIcon: Icon(Icons.explore),
+            label: 'Discover',
+          ),
           NavigationDestination(
-              icon: Icon(Icons.map_outlined),
-              selectedIcon: Icon(Icons.map),
-              label: 'Map'),
+            icon: Icon(Icons.map_outlined),
+            selectedIcon: Icon(Icons.map),
+            label: 'Map',
+          ),
           NavigationDestination(
-              icon: Icon(Icons.park_outlined),
-              selectedIcon: Icon(Icons.park),
-              label: 'Grove'),
+            icon: Icon(Icons.park_outlined),
+            selectedIcon: Icon(Icons.park),
+            label: 'Grove',
+          ),
           NavigationDestination(
-              icon: Icon(Icons.eco_outlined),
-              selectedIcon: Icon(Icons.eco),
-              label: 'Impact'),
+            icon: Icon(Icons.eco_outlined),
+            selectedIcon: Icon(Icons.eco),
+            label: 'Impact',
+          ),
           NavigationDestination(
-              icon: Icon(Icons.person_outline_rounded),
-              selectedIcon: Icon(Icons.person),
-              label: 'You'),
+            icon: Icon(Icons.person_outline_rounded),
+            selectedIcon: Icon(Icons.person),
+            label: 'You',
+          ),
         ],
       ),
     );
@@ -47,7 +52,11 @@ class ShellScaffold extends StatelessWidget {
 /// Shared placeholder body for tabs not yet implemented. Renders inside
 /// [ShellScaffold]'s Scaffold body, so it must NOT introduce its own Scaffold.
 class TabPlaceholder extends StatelessWidget {
-  const TabPlaceholder({super.key, required this.title, required this.subtitle});
+  const TabPlaceholder({
+    super.key,
+    required this.title,
+    required this.subtitle,
+  });
   final String title;
   final String subtitle;
 

@@ -75,7 +75,10 @@ void main() {
     testWidgets('canopy accent token is forest green', (tester) async {
       final theme = AppTheme.fromId('canopy');
       final ac = theme.extension<AppColors>()!;
-      expect(ac.amber, const Color(0xFF2F7D4F)); // "amber" token repurposed as the green accent
+      expect(
+        ac.amber,
+        const Color(0xFF2F7D4F),
+      ); // "amber" token repurposed as the green accent
       await drainFonts(tester);
     });
   });

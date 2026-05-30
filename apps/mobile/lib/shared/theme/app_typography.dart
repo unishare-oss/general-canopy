@@ -5,8 +5,10 @@ class AppTypography {
   /// Editorial pairing: Fraunces (serif) for display/headline, Space Grotesk
   /// (sans) for everything else. Both colored to [color].
   static TextTheme textTheme(Color color) {
-    final base = GoogleFonts.spaceGroteskTextTheme()
-        .apply(bodyColor: color, displayColor: color);
+    final base = GoogleFonts.spaceGroteskTextTheme().apply(
+      bodyColor: color,
+      displayColor: color,
+    );
     return base.copyWith(
       displayLarge: GoogleFonts.fraunces(textStyle: base.displayLarge),
       displayMedium: GoogleFonts.fraunces(textStyle: base.displayMedium),
