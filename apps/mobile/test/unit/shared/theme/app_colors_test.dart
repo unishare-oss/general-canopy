@@ -3,17 +3,17 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:canopy/shared/theme/app_colors.dart';
 
 const _sample = AppColors(
-  muted: Color(0xFFF7F3EE),
-  mutedForeground: Color(0xFF6B6560),
-  textSecondary: Color(0xFF6B6560),
-  textMuted: Color(0xFF8A837E),
-  amber: Color(0xFFD97706),
-  amberHover: Color(0xFFB45309),
-  amberSubtle: Color(0xFFFEF3C7),
-  success: Color(0xFF16A34A),
-  info: Color(0xFF0369A1),
-  surfaceDark: Color(0xFF1C1917),
-  cardDark: Color(0xFFF0EBE4),
+  muted: Color(0xFFEFEDE6),
+  mutedForeground: Color(0xFF4F5751),
+  textSecondary: Color(0xFF4F5751),
+  textMuted: Color(0xFF8A8F88),
+  amber: Color(0xFF2F7D4F),
+  amberHover: Color(0xFF1F5A38),
+  amberSubtle: Color(0xFFE8F3EC),
+  success: Color(0xFF2F9E44),
+  info: Color(0xFF2A6EBB),
+  surfaceDark: Color(0xFF1A1F1B),
+  cardDark: Color(0xFF1E2C24),
 );
 
 void main() {

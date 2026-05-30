@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'package:canopy/features/auth/presentation/providers/auth_state_provider.dart';
 import 'package:canopy/features/auth/presentation/providers/guest_mode_provider.dart';
 import 'package:canopy/features/auth/presentation/screens/welcome_screen.dart';
-import 'package:canopy/features/home/presentation/screens/home_screen.dart';
+import 'package:canopy/core/router/shell_scaffold.dart';
+import 'package:canopy/features/discover/presentation/screens/discover_screen.dart';
+import 'package:canopy/features/grove/presentation/screens/grove_screen.dart';
+import 'package:canopy/features/map/presentation/screens/map_screen.dart';
+import 'package:canopy/features/impact/presentation/screens/impact_screen.dart';
+import 'package:canopy/features/you/presentation/screens/you_screen.dart';
 
 part 'router.g.dart';
 
@@ -57,11 +61,11 @@ class _RouterNotifier extends ChangeNotifier {
           return decoded;
         }
       }
-      return '/home';
+      return '/grove';
     }
 
-    // 3. Root → /home.
-    if (currentPath == '/') return '/home';
+    // 3. Root → /grove.
+    if (currentPath == '/') return '/grove';
 
     return null;
   }
@@ -85,9 +89,39 @@ GoRouter router(Ref ref) {
         path: '/welcome',
         builder: (context, state) => const WelcomeScreen(),
       ),
-      GoRoute(
-        path: '/home',
-        builder: (context, state) => const HomeScreen(),
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) =>
+            ShellScaffold(navigationShell: navigationShell),
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/discover',
+                builder: (c, s) => const DiscoverScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(path: '/map', builder: (c, s) => const MapScreen()),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(path: '/grove', builder: (c, s) => const GroveScreen()),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(path: '/impact', builder: (c, s) => const ImpactScreen()),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(path: '/you', builder: (c, s) => const YouScreen()),
+            ],
+          ),
+        ],
       ),
     ],
   );
