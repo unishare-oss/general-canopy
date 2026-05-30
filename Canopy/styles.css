@@ -1,0 +1,333 @@
+/* ─────────────────────────────────────────────────────────
+   Canopy — adapted from BackOffice Calm Clarity, warmed with greens
+   ───────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* ── Primary — Leaf Green ── */
+  --primary:           #2F7D4F;
+  --primary-light:     #5BA37D;
+  --primary-deep:      #1F5A38;
+  --primary-surface:   #E8F3EC;
+  --primary-muted:     #B7DBC2;
+
+  /* ── Profit / Positive (also: healthy tree) ── */
+  --profit:            #3BA75E;
+  --profit-light:      #BFE7CB;
+  --profit-surface:    #EBF7EF;
+  --profit-deep:       #1E6B36;
+
+  /* ── Accent — warm sunlight gold (for badges / certificate / streaks) ── */
+  --accent:            #D9A441;
+  --accent-light:      #F4E0B0;
+  --accent-surface:    #FBF4E2;
+  --accent-deep:       #8B6519;
+
+  /* ── Bark — wood tone for tree illustrations & secondary feature ── */
+  --bark:              #7A5A3A;
+  --bark-light:        #C9B596;
+  --bark-surface:      #F1EBE0;
+
+  /* ── Semantic ── */
+  --success:           #2F9E44;
+  --success-bg:        #EBFBEE;
+  --warning:           #E2A130;
+  --warning-bg:        #FCF1D8;
+  --error:             #C44545;
+  --error-bg:          #FBE6E6;
+  --info:              #2A6EBB;
+  --info-bg:           #E5F0FA;
+
+  /* ── Tree health pin colors ── */
+  --pin-healthy:       #3BA75E;
+  --pin-attention:     #E2A130;
+  --pin-risk:          #C44545;
+  --pin-available:     #9DA39B;
+
+  /* ── Neutral surfaces (warm-tinted) ── */
+  --canvas:            #FFFFFF;
+  --surface:           #F6F4EE;
+  --surface-card:      #FFFFFF;
+  --surface-raised:    #EFEDE6;
+  --surface-overlay:   #E5E2D9;
+  --surface-dark:      #1A1F1B;
+
+  /* ── Ink ── */
+  --ink:               #1C2420;
+  --ink-secondary:     #4F5751;
+  --ink-tertiary:      #8A8F88;
+  --ink-disabled:      #C9CCC5;
+  --on-primary:        #FFFFFF;
+  --on-dark:           #F6F4EE;
+  --on-dark-muted:     #8A8F88;
+  --on-profit:         #1E6B36;
+  --on-accent:         #4A3408;
+
+  /* ── Hairlines ── */
+  --hairline:          #E2DFD7;
+  --hairline-soft:     #EEEBE2;
+  --hairline-strong:   #CFCBBE;
+
+  /* ── Fonts ── */
+  --font-display:      'Fraunces', Georgia, serif;
+  --font-body:         'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-numeric:      'Inter', sans-serif;
+
+  /* ── Sizing (mobile) ── */
+  --size-display-xl:   40px;
+  --size-display-lg:   32px;
+  --size-h1:           24px;
+  --size-h2:           20px;
+  --size-h3:           17px;
+  --size-h4:           15px;
+  --size-body-lg:      16px;
+  --size-body-md:      15px;
+  --size-body-sm:      13px;
+  --size-caption:      12px;
+  --size-micro:        11px;
+  --size-number-hero:  36px;
+  --size-number-md:    20px;
+
+  /* ── Spacing ── */
+  --space-xxs:   4px;
+  --space-xs:    8px;
+  --space-sm:    12px;
+  --space-md:    16px;
+  --space-lg:    20px;
+  --space-xl:    24px;
+  --space-xxl:   32px;
+  --space-xxxl:  40px;
+  --page-h:      16px;
+  --bottom-nav:  72px;
+
+  /* ── Radius ── */
+  --radius-xs:   4px;
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   16px;
+  --radius-xl:   20px;
+  --radius-xxl:  24px;
+  --radius-card: 18px;
+  --radius-sheet:24px;
+  --radius-full: 9999px;
+
+  /* ── Elevation ── */
+  --elev-0: none;
+  --elev-1: 0px 1px 3px rgba(28, 36, 32, 0.06), 0px 1px 2px rgba(28, 36, 32, 0.04);
+  --elev-2: 0px 4px 14px rgba(28, 36, 32, 0.08);
+  --elev-3: 0px 10px 28px rgba(28, 36, 32, 0.14);
+  --elev-4: 0px 18px 44px rgba(28, 36, 32, 0.18);
+  --elev-sheet: 0px -8px 28px rgba(28, 36, 32, 0.12);
+
+  /* ── Motion ── */
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast:    120ms;
+  --dur-base:    260ms;
+  --dur-sheet:   360ms;
+}
+
+/* ── DARK MODE ── */
+[data-theme="dark"] {
+  --primary:           #5BC182;
+  --primary-light:     #82D6A0;
+  --primary-deep:      #3FA268;
+  --primary-surface:   #1E2C24;
+  --primary-muted:     #2D4A38;
+
+  --profit:            #5BC182;
+  --profit-light:      #2D4A38;
+  --profit-surface:    #1E2C24;
+  --profit-deep:       #82D6A0;
+
+  --accent:            #E8BE6F;
+  --accent-light:      #3A3220;
+  --accent-surface:    #2A2418;
+  --on-accent:         #FFF;
+
+  --pin-healthy:       #5BC182;
+  --pin-attention:     #E8BE6F;
+  --pin-risk:          #E27575;
+  --pin-available:     #6B716A;
+
+  --canvas:            #161B17;
+  --surface:           #0F1412;
+  --surface-card:      #1A211D;
+  --surface-raised:    #232B27;
+  --surface-overlay:   #2D3530;
+  --surface-dark:      #0B0F0D;
+
+  --ink:               #ECEBE3;
+  --ink-secondary:     #B5B9AF;
+  --ink-tertiary:      #7E837B;
+  --ink-disabled:      #4A4E48;
+  --on-primary:        #0B130E;
+  --on-dark:           #ECEBE3;
+
+  --hairline:          #2A322D;
+  --hairline-soft:     #232B27;
+  --hairline-strong:   #3D453F;
+
+  --bark:              #B89373;
+  --bark-light:        #4A3A2A;
+  --bark-surface:      #2A2218;
+
+  --warning-bg:        #3A3220;
+  --error-bg:          #3A2424;
+  --success-bg:        #1E2C24;
+  --info-bg:           #1E2A38;
+}
+
+/* ── Density modifiers (applied to .canopy-root) ── */
+.canopy-root[data-density="compact"] {
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 18px;
+  --size-h1: 22px;
+  --size-body-md: 14px;
+  --radius-card: 14px;
+}
+.canopy-root[data-density="comfy"] {
+  --space-md: 20px;
+  --space-lg: 24px;
+  --space-xl: 28px;
+  --size-body-md: 16px;
+}
+
+/* ── Reset within app ── */
+.canopy-root, .canopy-root *,
+.canopy-root *::before, .canopy-root *::after {
+  box-sizing: border-box;
+}
+.canopy-root {
+  font-family: var(--font-body);
+  color: var(--ink);
+  background: var(--surface);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+.canopy-root button { font-family: inherit; cursor: pointer; }
+.canopy-root img { display: block; max-width: 100%; }
+
+/* ── Type ── */
+.canopy-root .h-display { font-family: var(--font-display); font-weight: 500; font-size: var(--size-display-lg); line-height: 1.05; letter-spacing: -0.02em; }
+.canopy-root .h1 { font-family: var(--font-display); font-weight: 500; font-size: var(--size-h1); line-height: 1.2; letter-spacing: -0.01em; }
+.canopy-root .h2 { font-family: var(--font-display); font-weight: 500; font-size: var(--size-h2); line-height: 1.25; letter-spacing: -0.005em; }
+.canopy-root .h3 { font-weight: 600; font-size: var(--size-h3); line-height: 1.3; letter-spacing: -0.005em; }
+.canopy-root .h4 { font-weight: 600; font-size: var(--size-h4); line-height: 1.35; }
+.canopy-root .body-lg { font-size: var(--size-body-lg); line-height: 1.55; }
+.canopy-root .body-md { font-size: var(--size-body-md); line-height: 1.55; }
+.canopy-root .body-sm { font-size: var(--size-body-sm); line-height: 1.5; }
+.canopy-root .caption { font-size: var(--size-caption); line-height: 1.45; color: var(--ink-tertiary); }
+.canopy-root .micro { font-size: var(--size-micro); letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; color: var(--ink-tertiary); }
+.canopy-root .num { font-variant-numeric: tabular-nums lining-nums; font-weight: 600; font-family: var(--font-numeric); }
+.canopy-root .num-hero { font-family: var(--font-display); font-feature-settings: "tnum"; font-weight: 500; font-size: var(--size-number-hero); line-height: 1; letter-spacing: -0.02em; }
+
+/* ── Buttons ── */
+.canopy-root .btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 48px; padding: 0 20px;
+  font-size: 15px; font-weight: 600; font-family: inherit;
+  border-radius: var(--radius-full);
+  border: 1px solid transparent;
+  background: var(--primary); color: var(--on-primary);
+  transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast);
+  user-select: none;
+}
+.canopy-root .btn:active { transform: scale(0.97); }
+.canopy-root .btn.secondary { background: var(--surface-card); color: var(--ink); border-color: var(--hairline); }
+.canopy-root .btn.ghost { background: transparent; color: var(--ink); }
+.canopy-root .btn.danger { background: var(--error); }
+.canopy-root .btn.sm { height: 36px; padding: 0 14px; font-size: 13px; }
+.canopy-root .btn.block { width: 100%; }
+.canopy-root .btn[disabled] { background: var(--surface-overlay); color: var(--ink-disabled); }
+
+/* ── Card ── */
+.canopy-root .card {
+  background: var(--surface-card);
+  border-radius: var(--radius-card);
+  box-shadow: var(--elev-1);
+  padding: var(--space-md);
+}
+.canopy-root .card-flat {
+  background: var(--surface-card);
+  border-radius: var(--radius-card);
+  border: 1px solid var(--hairline);
+}
+
+/* ── Chip ── */
+.canopy-root .chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  height: 24px; padding: 0 10px;
+  border-radius: var(--radius-full);
+  background: var(--surface-raised); color: var(--ink-secondary);
+  font-size: 12px; font-weight: 500;
+}
+.canopy-root .chip.profit { background: var(--profit-surface); color: var(--profit-deep); }
+.canopy-root .chip.warn   { background: var(--warning-bg); color: var(--warning); }
+.canopy-root .chip.danger { background: var(--error-bg); color: var(--error); }
+.canopy-root .chip.accent { background: var(--accent-surface); color: var(--accent-deep); }
+.canopy-root .chip.primary{ background: var(--primary-surface); color: var(--primary-deep); }
+
+/* ── Inputs ── */
+.canopy-root .input {
+  width: 100%; height: 48px; padding: 0 16px;
+  background: var(--surface-raised); border: 1px solid transparent;
+  border-radius: var(--radius-md); font-size: 15px; color: var(--ink);
+  font-family: inherit; outline: none;
+  transition: border-color var(--dur-fast), background var(--dur-fast);
+}
+.canopy-root .input:focus { border-color: var(--primary); background: var(--canvas); }
+
+/* ── Live dot pulse ── */
+@keyframes canopy-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.75); }
+}
+.canopy-root .live-dot {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--pin-healthy);
+  animation: canopy-pulse 1500ms var(--ease-in-out) infinite;
+}
+
+/* ── Phosphor icon sizing helper ── */
+.canopy-root .pi { font-size: 22px; line-height: 1; display: inline-block; }
+.canopy-root .pi-sm { font-size: 18px; }
+.canopy-root .pi-lg { font-size: 28px; }
+.canopy-root .pi-xl { font-size: 40px; }
+
+/* ── Hide scrollbars on phone-y scroll areas ── */
+.canopy-root .scroll-y { overflow-y: auto; overflow-x: hidden; }
+.canopy-root .scroll-y::-webkit-scrollbar { width: 0; }
+.canopy-root .scroll-x { overflow-x: auto; overflow-y: hidden; }
+.canopy-root .scroll-x::-webkit-scrollbar { height: 0; }
+
+/* ── Slide in/out for screens ── */
+@keyframes canopy-slide-in { from { transform: translateX(40px); } to { transform: translateX(0); } }
+@keyframes canopy-fade-up { from { transform: translateY(8px); } to { transform: translateY(0); } }
+.canopy-root .slide-in { animation: canopy-slide-in 260ms var(--ease-out); }
+.canopy-root .fade-up { animation: canopy-fade-up 220ms var(--ease-out); }
+
+/* ── Bottom sheet ── */
+.canopy-root .sheet-backdrop {
+  position: absolute; inset: 0; background: rgba(28, 36, 32, 0.5);
+  z-index: 30; animation: canopy-fadein 200ms ease;
+}
+@keyframes canopy-fadein { from { opacity: 0; } to { opacity: 1; } }
+@keyframes canopy-sheet-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.canopy-root .sheet {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  background: var(--surface-card);
+  border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
+  z-index: 31; padding: 16px 16px 32px;
+  animation: canopy-sheet-up 360ms var(--ease-out);
+  box-shadow: var(--elev-sheet);
+  max-height: 90%;
+}
+.canopy-root .sheet-handle {
+  width: 36px; height: 4px; background: var(--hairline-strong);
+  border-radius: 2px; margin: 0 auto 12px;
+}

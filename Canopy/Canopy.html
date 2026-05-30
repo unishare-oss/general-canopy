@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Canopy — adopt a tree on your block</title>
+
+<!-- Phosphor icons (single CDN bundle) -->
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+
+<link rel="stylesheet" href="styles.css" />
+
+<style>
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    background: #E5E2D9;
+    font-family: 'Inter', system-ui, sans-serif;
+    color: #1C2420;
+    overscroll-behavior: none;
+  }
+  [data-theme="dark"] body { background: #0A0D0B; }
+
+  /* Stage: center the phone, scale to fit */
+  .stage {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+    background: radial-gradient(ellipse at center, #E8E4D8 0%, #D9D5C6 100%);
+  }
+  [data-theme="dark"] .stage {
+    background: radial-gradient(ellipse at center, #1A1F1B 0%, #0A0D0B 100%);
+  }
+
+  /* Phone shell — Android device frame, theme-aware */
+  .phone-frame {
+    width: 412px; height: 892px;
+    border-radius: 44px;
+    background: #1d1f1c;
+    padding: 10px;
+    box-shadow:
+      0 50px 120px rgba(0,0,0,0.35),
+      0 0 0 1.5px rgba(255,255,255,0.06) inset;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .phone-screen {
+    width: 100%; height: 100%;
+    border-radius: 34px;
+    overflow: hidden;
+    background: #F6F4EE;
+    display: flex; flex-direction: column;
+    position: relative;
+  }
+  [data-theme="dark"] .phone-screen { background: #0F1412; }
+
+  /* Camera punch hole */
+  .phone-frame::before {
+    content: ''; position: absolute;
+    top: 22px; left: 50%; transform: translateX(-50%);
+    width: 12px; height: 12px; border-radius: 50%;
+    background: #000; z-index: 10;
+  }
+
+  /* Status bar — top of screen */
+  .status-bar {
+    height: 36px; flex-shrink: 0;
+    padding: 0 20px 0 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 13px; font-weight: 600;
+    color: #1C2420;
+    background: transparent;
+  }
+  [data-theme="dark"] .status-bar { color: #ECEBE3; }
+  .status-bar .icons { display: flex; gap: 5px; align-items: center; }
+
+  /* Gesture nav indicator */
+  .gesture-bar {
+    height: 18px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .gesture-bar > div {
+    width: 130px; height: 4px;
+    border-radius: 2px;
+    background: rgba(28, 36, 32, 0.4);
+  }
+  [data-theme="dark"] .gesture-bar > div { background: rgba(236, 235, 227, 0.4); }
+
+  /* Mount point */
+  #app-mount { flex: 1; position: relative; overflow: hidden; }
+
+  /* Scale phone to fit small viewports */
+  @media (max-height: 920px) {
+    .phone-frame { transform: scale(calc(100vh / 940)); transform-origin: center center; }
+  }
+  @media (max-width: 460px) {
+    .phone-frame { transform: scale(calc(100vw / 440)); transform-origin: center center; }
+  }
+</style>
+</head>
+<body>
+<div data-screen-label="Canopy app">
+  <div class="stage">
+    <div class="phone-frame">
+      <div class="phone-screen">
+        <div class="status-bar">
+          <span>9:30</span>
+          <span class="icons">
+            <svg width="14" height="10" viewBox="0 0 14 10"><path d="M1 6 Q4 2 7 6 M4 8 Q7 4 10 8 M7 10 Q10 7 13 10" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round" /></svg>
+            <svg width="14" height="10" viewBox="0 0 14 10"><path d="M1 9 L1 7 M4 9 L4 5 M7 9 L7 3 M10 9 L10 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" /></svg>
+            <svg width="20" height="10" viewBox="0 0 20 10"><rect x="0.5" y="0.5" width="17" height="9" rx="2" stroke="currentColor" fill="none" /><rect x="2" y="2" width="11" height="6" rx="1" fill="currentColor" /><rect x="18" y="3" width="1.5" height="4" rx="0.5" fill="currentColor" /></svg>
+          </span>
+        </div>
+        <div id="app-mount"></div>
+        <div class="gesture-bar"><div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- React + Babel -->
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<!-- Tweaks panel helpers -->
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+
+<!-- Canopy data + components -->
+<script src="app/canopy-data.js"></script>
+<script type="text/babel" src="app/canopy-components.jsx"></script>
+<script type="text/babel" src="app/canopy-discover.jsx"></script>
+<script type="text/babel" src="app/canopy-grove.jsx"></script>
+<script type="text/babel" src="app/canopy-map.jsx"></script>
+<script type="text/babel" src="app/canopy-impact.jsx"></script>
+<script type="text/babel" src="app/canopy-modals.jsx"></script>
+<script type="text/babel" src="app/canopy-app.jsx"></script>
+
+<script type="text/babel">
+  const root = ReactDOM.createRoot(document.getElementById('app-mount'));
+  root.render(<CanopyApp />);
+</script>
+</body>
+</html>
