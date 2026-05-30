@@ -35,7 +35,7 @@ class ShellScaffold extends StatelessWidget {
               selectedIcon: Icon(Icons.eco),
               label: 'Impact'),
           NavigationDestination(
-              icon: Icon(Icons.person_outline),
+              icon: Icon(Icons.person_outline_rounded),
               selectedIcon: Icon(Icons.person),
               label: 'You'),
         ],
@@ -44,7 +44,8 @@ class ShellScaffold extends StatelessWidget {
   }
 }
 
-/// Shared placeholder body for tabs not yet implemented.
+/// Shared placeholder body for tabs not yet implemented. Renders inside
+/// [ShellScaffold]'s Scaffold body, so it must NOT introduce its own Scaffold.
 class TabPlaceholder extends StatelessWidget {
   const TabPlaceholder({super.key, required this.title, required this.subtitle});
   final String title;
@@ -53,18 +54,20 @@ class TabPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: theme.textTheme.displaySmall),
-              Text(subtitle, style: theme.textTheme.bodyMedium),
-              const Expanded(child: Center(child: Text('Coming soon'))),
-            ],
-          ),
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: theme.textTheme.displaySmall),
+            Text(subtitle, style: theme.textTheme.bodyMedium),
+            Expanded(
+              child: Center(
+                child: Text('Coming soon', style: theme.textTheme.bodySmall),
+              ),
+            ),
+          ],
         ),
       ),
     );
