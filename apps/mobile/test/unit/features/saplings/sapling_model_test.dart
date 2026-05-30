@@ -51,4 +51,11 @@ void main() {
     expect(s.adoptedBy, 'user_abc');
     expect(s.isAvailable, isFalse);
   });
+
+  test('toEntity falls back to available for unknown status', () {
+    final unknownJson = Map<String, dynamic>.from(json)..['status'] = 'pending_review';
+    final s = SaplingModel.fromJson(unknownJson).toEntity('t3');
+    expect(s.status, SaplingStatus.available);
+    expect(s.isAvailable, isTrue);
+  });
 }
