@@ -28,6 +28,9 @@ void main() {
     expect(m.nickname, 'Olive');
     expect(m.wateringIntervalDays, 3);
     expect(m.status, 'available');
+    expect(m.colorHex, '#D87FA8'); // @JsonKey(name: 'color')
+    expect(m.adoptedBy, isNull);
+    expect(m.photoUrl, isNull);
   });
 
   test('toEntity maps to domain Sapling with parsed status', () {
@@ -37,5 +40,15 @@ void main() {
     expect(s.status, SaplingStatus.available);
     expect(s.colorHex, '#D87FA8');
     expect(s.isAvailable, isTrue);
+  });
+
+  test('toEntity maps adopted status and adoptedBy', () {
+    final adoptedJson = Map<String, dynamic>.from(json)
+      ..['status'] = 'adopted'
+      ..['adoptedBy'] = 'user_abc';
+    final s = SaplingModel.fromJson(adoptedJson).toEntity('t2');
+    expect(s.status, SaplingStatus.adopted);
+    expect(s.adoptedBy, 'user_abc');
+    expect(s.isAvailable, isFalse);
   });
 }

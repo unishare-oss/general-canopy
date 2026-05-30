@@ -47,9 +47,12 @@ abstract class SaplingModel with _$SaplingModel {
         lightLabel: lightLabel,
         wateringIntervalDays: wateringIntervalDays,
         colorHex: colorHex,
-        status: status == 'adopted'
-            ? SaplingStatus.adopted
-            : SaplingStatus.available,
+        // Unknown/new status strings fall back to `available` on purpose — a
+        // malformed value should never make a tree look adopted/unavailable.
+        status: switch (status) {
+          'adopted' => SaplingStatus.adopted,
+          _ => SaplingStatus.available,
+        },
         photoUrl: photoUrl,
         adoptedBy: adoptedBy,
       );
