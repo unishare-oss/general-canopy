@@ -1,0 +1,49 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+class CanopyLogo extends StatelessWidget {
+  const CanopyLogo({
+    super.key,
+    this.iconSize = 40,
+    this.fontSize = 20,
+    this.darkText = true,
+  });
+
+  final double iconSize;
+  final double fontSize;
+  final bool darkText;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: iconSize,
+          height: iconSize,
+          decoration: BoxDecoration(
+            color: cs.surface,
+            borderRadius: BorderRadius.circular(6),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: SvgPicture.asset('assets/icon.svg', fit: BoxFit.contain),
+        ),
+        const SizedBox(width: 10),
+        Flexible(
+          child: Text(
+            'Canopy',
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              fontSize: fontSize,
+              fontWeight: FontWeight.bold,
+              color: darkText
+                  ? cs.onSurface
+                  : Theme.of(context).scaffoldBackgroundColor,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}

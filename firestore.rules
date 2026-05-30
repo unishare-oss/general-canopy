@@ -1,0 +1,23 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── User profiles ─────────────────────────────────────────────────────
+    // Owner-only access. The auth feature creates this doc on sign-up and
+    // updates it from the profile flow. Tighten or expand fields as Canopy's
+    // schema grows.
+    match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update: if request.auth != null && request.auth.uid == userId;
+      allow delete: if false;
+    }
+
+    // ── Default deny ──────────────────────────────────────────────────────
+    // Every other collection is locked down until you add an explicit rule.
+    // Add new `match` blocks above this line as you build features.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

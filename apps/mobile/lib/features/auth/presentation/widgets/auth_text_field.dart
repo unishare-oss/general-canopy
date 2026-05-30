@@ -1,0 +1,109 @@
+import 'package:flutter/material.dart';
+import 'package:canopy/shared/theme/app_colors.dart';
+
+class AuthTextField extends StatefulWidget {
+  const AuthTextField({
+    super.key,
+    required this.hint,
+    this.label,
+    this.controller,
+    this.validator,
+    this.obscureText = false,
+    this.keyboardType,
+    this.textInputAction,
+    this.onFieldSubmitted,
+    this.enabled = true,
+    this.autofillHints,
+    this.suffixIcon,
+  });
+
+  final String hint;
+  final String? label;
+  final TextEditingController? controller;
+  final String? Function(String?)? validator;
+  final bool obscureText;
+  final TextInputType? keyboardType;
+  final TextInputAction? textInputAction;
+  final ValueChanged<String>? onFieldSubmitted;
+  final bool enabled;
+  final Iterable<String>? autofillHints;
+  final Widget? suffixIcon;
+
+  @override
+  State<AuthTextField> createState() => _AuthTextFieldState();
+}
+
+class _AuthTextFieldState extends State<AuthTextField> {
+  late bool _obscured;
+
+  @override
+  void initState() {
+    super.initState();
+    _obscured = widget.obscureText;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppColors>()!;
+    final theme = Theme.of(context);
+    final baseStyle = theme.textTheme.bodyMedium?.copyWith(
+      color: theme.colorScheme.onSurface,
+    );
+
+    final field = TextFormField(
+      controller: widget.controller,
+      validator: widget.validator,
+      obscureText: _obscured,
+      keyboardType: widget.keyboardType,
+      textInputAction: widget.textInputAction,
+      onFieldSubmitted: widget.onFieldSubmitted,
+      enabled: widget.enabled,
+      autofillHints: widget.autofillHints,
+      style: baseStyle,
+      decoration: InputDecoration(
+        hintText: widget.hint,
+        hintStyle: baseStyle?.copyWith(color: colors.textSecondary),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+        isDense: true,
+        errorStyle: theme.textTheme.bodySmall?.copyWith(
+          color: theme.colorScheme.error,
+        ),
+        // Fixed 36×36 slot on every field keeps all heights identical.
+        suffixIconConstraints: const BoxConstraints.tightFor(
+          width: 36,
+          height: 36,
+        ),
+        suffixIcon:
+            widget.suffixIcon ??
+            (widget.obscureText
+                ? GestureDetector(
+                    onTap: () => setState(() => _obscured = !_obscured),
+                    child: Icon(
+                      _obscured ? Icons.visibility_off : Icons.visibility,
+                      color: colors.textSecondary,
+                      size: 18,
+                    ),
+                  )
+                : const SizedBox.shrink()),
+      ),
+    );
+
+    if (widget.label == null) return field;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          widget.label!,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurface,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 6),
+        field,
+      ],
+    );
+  }
+}

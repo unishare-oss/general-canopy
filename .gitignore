@@ -1,0 +1,51 @@
+# macOS
+.DS_Store
+
+# PDF docs (handbook reference, not source)
+*.pdf
+
+# FVM (Flutter Version Manager) — keep config, ignore SDK
+.fvm/flutter_sdk
+
+# IntelliJ / Android Studio
+.idea/
+*.iml
+
+# VS Code — launch.json is committed so teammates get the run config
+# Add .vscode/ back here if you want to stop sharing it
+.vscode/*.log
+
+# Git worktrees
+.worktrees/
+
+# Claude Code agent session files
+.claude/worktrees/
+**/.claude/settings.local.json
+**/.claude/worktrees/
+
+# Agent log 
+apps/mobile/docs/
+
+# Environment / secrets
+.env
+*.env.local
+
+# Firebase CLI cache (local hosting emulator, deploy cache)
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
+# GSD
+.planning/
+
+# Firebase service account keys
+tools/*service-account*.json
+tools/*serviceAccount*.json
+*-firebase-adminsdk-*.json
+
+# Android build artifacts
+apps/mobile/android/build/
+
+# Local helper scripts
+scripts/
