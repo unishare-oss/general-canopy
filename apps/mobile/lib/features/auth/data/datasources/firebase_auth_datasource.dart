@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import 'package:canopy/features/auth/domain/entities/auth_exception.dart';
@@ -90,15 +91,17 @@ class FirebaseAuthDatasource {
   }
 
   AuthException _mapException(FirebaseAuthException e) {
+    debugPrint('FirebaseAuthException [${e.code}]: ${e.message}');
     return switch (e.code) {
       'wrong-password' || 'user-not-found' || 'invalid-credential' =>
         const AuthException(AuthFailureType.invalidCredentials),
       'email-already-in-use' || 'credential-already-in-use' =>
         const AuthException(AuthFailureType.emailAlreadyInUse),
-      'network-request-failed' => const AuthException(
-        AuthFailureType.networkError,
-      ),
-      _ => AuthException(AuthFailureType.unknown, e.message),
+      'network-request-failed' =>
+        const AuthException(AuthFailureType.networkError),
+      'operation-not-allowed' =>
+        const AuthException(AuthFailureType.providerDisabled),
+      _ => const AuthException(AuthFailureType.unknown),
     };
   }
 }

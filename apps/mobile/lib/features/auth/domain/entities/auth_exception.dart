@@ -2,6 +2,7 @@ enum AuthFailureType {
   invalidCredentials,
   emailAlreadyInUse,
   networkError,
+  providerDisabled,
   unknown,
 }
 
@@ -16,6 +17,8 @@ class AuthException implements Exception {
     AuthFailureType.emailAlreadyInUse =>
       'An account with this email already exists',
     AuthFailureType.networkError => 'Check your connection and try again',
+    AuthFailureType.providerDisabled =>
+      'Email sign-in is not enabled. Please contact support.',
     AuthFailureType.unknown => message ?? 'Something went wrong',
   };
 }
