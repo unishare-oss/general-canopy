@@ -147,3 +147,125 @@ Files:
   ~ apps/mobile/lib/features/auth/data/repositories/auth_repository_impl.dart
 Summary:  1 file changed, 12 insertions(+), 3 deletions(-)
 
+  [13:42] Write: apps/mobile/lib/features/saplings/domain/entities/sapling_exceptions.dart
+  [13:42] Write: apps/mobile/lib/features/saplings/domain/repositories/sapling_repository.dart
+  [13:43] Write: apps/mobile/lib/features/saplings/domain/usecases/get_available_saplings.dart
+  [13:43] Write: apps/mobile/lib/features/saplings/domain/usecases/get_all_saplings.dart
+  [13:43] Write: apps/mobile/lib/features/saplings/domain/usecases/get_sapling_by_id.dart
+  [13:43] Write: apps/mobile/lib/features/saplings/domain/usecases/adopt_sapling.dart
+  [13:43] Write: apps/mobile/lib/features/saplings/data/datasources/firestore_sapling_datasource.dart
+  [13:43] Write: apps/mobile/lib/features/saplings/data/repositories/sapling_repository_impl.dart
+  [13:43] Write: apps/mobile/lib/features/saplings/presentation/providers/sapling_repository_provider.dart
+  [13:43] Write: apps/mobile/lib/features/saplings/presentation/providers/available_saplings_provider.dart
+  [13:43] Write: apps/mobile/lib/features/saplings/presentation/providers/discover_queue_provider.dart
+  [13:43] Write: apps/mobile/lib/features/discover/presentation/widgets/sapling_card.dart
+  [13:44] Write: apps/mobile/lib/features/discover/presentation/widgets/sapling_card_stack.dart
+  [13:44] Write: apps/mobile/lib/features/discover/presentation/widgets/adopt_confirmation_sheet.dart
+  [13:44] Write: apps/mobile/lib/features/discover/presentation/screens/discover_screen.dart
+  [13:44] Write: apps/mobile/lib/features/discover/presentation/screens/sapling_detail_screen.dart
+  [13:45] Write: apps/mobile/lib/features/map/presentation/screens/map_screen.dart
+  [13:45] Edit: apps/mobile/lib/core/router/router.dart
+  [13:45] Edit: apps/mobile/lib/core/router/router.dart
+  [13:46] Edit: apps/mobile/pubspec.yaml
+  [13:52] Write: apps/mobile/lib/features/discover/presentation/screens/discover_screen.dart
+  [13:52] Write: apps/mobile/lib/features/discover/presentation/screens/sapling_detail_screen.dart
+  [13:53] Edit: apps/mobile/lib/features/saplings/presentation/providers/available_saplings_provider.dart
+  [13:53] Edit: apps/mobile/lib/features/saplings/presentation/providers/discover_queue_provider.dart
+  [13:53] Edit: apps/mobile/lib/features/saplings/presentation/providers/sapling_repository_provider.dart
+Files:
+  ~ apps/mobile/lib/core/router/router.dart
+  ~ apps/mobile/lib/features/auth/data/datasources/firebase_auth_datasource.dart
+  ~ apps/mobile/lib/features/auth/presentation/screens/onboarding_screen.dart
+  ~ apps/mobile/lib/features/auth/presentation/screens/welcome_screen.dart
+  ~ apps/mobile/lib/features/discover/presentation/screens/discover_screen.dart
+  ~ apps/mobile/lib/features/map/presentation/screens/map_screen.dart
+  ~ apps/mobile/pubspec.yaml
+  ? apps/mobile/lib/features/discover/presentation/screens/sapling_detail_screen.dart (untracked)
+  ? apps/mobile/lib/features/discover/presentation/widgets/ (untracked)
+  ? apps/mobile/lib/features/saplings/data/datasources/ (untracked)
+  ? apps/mobile/lib/features/saplings/data/repositories/ (untracked)
+  ? apps/mobile/lib/features/saplings/domain/entities/sapling_exceptions.dart (untracked)
+  ? apps/mobile/lib/features/saplings/domain/repositories/ (untracked)
+  ? apps/mobile/lib/features/saplings/domain/usecases/ (untracked)
+  ? apps/mobile/lib/features/saplings/presentation/ (untracked)
+Summary:  7 files changed, 413 insertions(+), 90 deletions(-)
+
+Files:
+  ~ apps/mobile/lib/core/router/router.dart
+  ~ apps/mobile/lib/features/auth/data/datasources/firebase_auth_datasource.dart
+  ~ apps/mobile/lib/features/auth/presentation/screens/onboarding_screen.dart
+  ~ apps/mobile/lib/features/auth/presentation/screens/welcome_screen.dart
+  ~ apps/mobile/lib/features/discover/presentation/screens/discover_screen.dart
+  ~ apps/mobile/lib/features/map/presentation/screens/map_screen.dart
+  ~ apps/mobile/pubspec.yaml
+  ? apps/mobile/lib/features/discover/presentation/screens/sapling_detail_screen.dart (untracked)
+  ? apps/mobile/lib/features/discover/presentation/widgets/ (untracked)
+  ? apps/mobile/lib/features/saplings/data/datasources/ (untracked)
+  ? apps/mobile/lib/features/saplings/data/repositories/ (untracked)
+  ? apps/mobile/lib/features/saplings/domain/entities/sapling_exceptions.dart (untracked)
+  ? apps/mobile/lib/features/saplings/domain/repositories/ (untracked)
+  ? apps/mobile/lib/features/saplings/domain/usecases/ (untracked)
+  ? apps/mobile/lib/features/saplings/presentation/ (untracked)
+Summary:  7 files changed, 413 insertions(+), 90 deletions(-)
+
+Files:
+  ~ apps/mobile/lib/core/router/router.dart
+  ~ apps/mobile/lib/features/discover/presentation/screens/discover_screen.dart
+  ~ apps/mobile/lib/features/map/presentation/screens/map_screen.dart
+  ~ apps/mobile/pubspec.yaml
+  ? apps/mobile/lib/features/discover/presentation/screens/sapling_detail_screen.dart (untracked)
+  ? apps/mobile/lib/features/discover/presentation/widgets/ (untracked)
+  ? apps/mobile/lib/features/saplings/data/datasources/ (untracked)
+  ? apps/mobile/lib/features/saplings/data/repositories/ (untracked)
+  ? apps/mobile/lib/features/saplings/domain/entities/sapling_exceptions.dart (untracked)
+  ? apps/mobile/lib/features/saplings/domain/repositories/ (untracked)
+  ? apps/mobile/lib/features/saplings/domain/usecases/ (untracked)
+  ? apps/mobile/lib/features/saplings/presentation/ (untracked)
+Summary:  4 files changed, 178 insertions(+), 10 deletions(-)
+
+Files:
+  ~ apps/mobile/lib/core/router/router.dart
+  ~ apps/mobile/lib/features/discover/presentation/screens/discover_screen.dart
+  ~ apps/mobile/lib/features/map/presentation/screens/map_screen.dart
+  ~ apps/mobile/pubspec.yaml
+  ? apps/mobile/lib/features/discover/presentation/screens/sapling_detail_screen.dart (untracked)
+  ? apps/mobile/lib/features/discover/presentation/widgets/ (untracked)
+  ? apps/mobile/lib/features/saplings/data/datasources/ (untracked)
+  ? apps/mobile/lib/features/saplings/data/repositories/ (untracked)
+  ? apps/mobile/lib/features/saplings/domain/entities/sapling_exceptions.dart (untracked)
+  ? apps/mobile/lib/features/saplings/domain/repositories/ (untracked)
+  ? apps/mobile/lib/features/saplings/domain/usecases/ (untracked)
+  ? apps/mobile/lib/features/saplings/presentation/ (untracked)
+Summary:  4 files changed, 178 insertions(+), 10 deletions(-)
+
+Files:
+  ~ apps/mobile/lib/core/router/router.dart
+  ~ apps/mobile/lib/features/discover/presentation/screens/discover_screen.dart
+  ~ apps/mobile/lib/features/map/presentation/screens/map_screen.dart
+  ~ apps/mobile/pubspec.yaml
+  ? apps/mobile/lib/features/discover/presentation/screens/sapling_detail_screen.dart (untracked)
+  ? apps/mobile/lib/features/discover/presentation/widgets/ (untracked)
+  ? apps/mobile/lib/features/saplings/data/datasources/ (untracked)
+  ? apps/mobile/lib/features/saplings/data/repositories/ (untracked)
+  ? apps/mobile/lib/features/saplings/domain/entities/sapling_exceptions.dart (untracked)
+  ? apps/mobile/lib/features/saplings/domain/repositories/ (untracked)
+  ? apps/mobile/lib/features/saplings/domain/usecases/ (untracked)
+  ? apps/mobile/lib/features/saplings/presentation/ (untracked)
+Summary:  4 files changed, 178 insertions(+), 10 deletions(-)
+
+Files:
+  ~ apps/mobile/lib/core/router/router.dart
+  ~ apps/mobile/lib/features/discover/presentation/screens/discover_screen.dart
+  ~ apps/mobile/lib/features/map/presentation/screens/map_screen.dart
+  ~ apps/mobile/pubspec.yaml
+  ? apps/mobile/lib/features/discover/presentation/screens/sapling_detail_screen.dart (untracked)
+  ? apps/mobile/lib/features/discover/presentation/widgets/ (untracked)
+  ? apps/mobile/lib/features/saplings/data/datasources/ (untracked)
+  ? apps/mobile/lib/features/saplings/data/repositories/ (untracked)
+  ? apps/mobile/lib/features/saplings/domain/entities/sapling_exceptions.dart (untracked)
+  ? apps/mobile/lib/features/saplings/domain/repositories/ (untracked)
+  ? apps/mobile/lib/features/saplings/domain/usecases/ (untracked)
+  ? apps/mobile/lib/features/saplings/presentation/ (untracked)
+Summary:  4 files changed, 178 insertions(+), 10 deletions(-)
+
+  [15:08] Edit: apps/mobile/lib/features/discover/presentation/widgets/sapling_card.dart
