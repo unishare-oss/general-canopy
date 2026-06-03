@@ -280,3 +280,30 @@ Summary:  4 files changed, 178 insertions(+), 10 deletions(-)
   [15:28] Write: apps/mobile/test/widget/features/discover/presentation/screens/sapling_detail_screen_test.dart
   [15:29] Write: apps/mobile/test/widget/features/map/presentation/screens/map_screen_test.dart
   [15:31] Edit: apps/mobile/test/unit/features/saplings/domain/usecases/adopt_sapling_test.dart
+Files:
+  ~ apps/mobile/lib/features/map/presentation/screens/map_screen.dart
+Summary:  1 file changed, 195 insertions(+), 26 deletions(-)
+
+Files:
+  ~ apps/mobile/lib/features/map/presentation/screens/map_screen.dart
+Summary:  1 file changed, 195 insertions(+), 26 deletions(-)
+
+Files:
+  ~ apps/mobile/lib/features/map/presentation/screens/map_screen.dart
+Summary:  1 file changed, 195 insertions(+), 26 deletions(-)
+
+  [21:48] Edit: apps/mobile/lib/features/saplings/domain/entities/sapling.dart
+  [21:48] Edit: apps/mobile/lib/features/saplings/domain/repositories/sapling_repository.dart
+  [21:48] Edit: apps/mobile/lib/features/saplings/domain/usecases/adopt_sapling.dart
+  [21:48] Edit: apps/mobile/lib/features/saplings/data/datasources/firestore_sapling_datasource.dart
+  [21:48] Edit: apps/mobile/lib/features/saplings/data/datasources/firestore_sapling_datasource.dart
+  [21:48] Edit: apps/mobile/lib/features/saplings/data/repositories/sapling_repository_impl.dart
+  [21:49] Edit: apps/mobile/lib/features/saplings/data/models/sapling_model.dart
+  [21:49] Edit: apps/mobile/lib/features/saplings/data/models/sapling_model.dart
+  [21:49] Edit: apps/mobile/lib/features/saplings/presentation/providers/discover_queue_provider.dart
+  [21:49] Edit: apps/mobile/lib/features/discover/presentation/screens/discover_screen.dart
+  [21:49] Edit: apps/mobile/lib/features/discover/presentation/screens/sapling_detail_screen.dart
+  [21:49] Edit: apps/mobile/lib/features/discover/presentation/screens/sapling_detail_screen.dart
+  [21:49] Edit: apps/mobile/lib/features/map/presentation/screens/map_screen.dart
+  [21:49] Edit: apps/mobile/lib/features/map/presentation/screens/map_screen.dart
+  [21:49] Edit: apps/mobile/lib/features/map/presentation/screens/map_screen.dart
