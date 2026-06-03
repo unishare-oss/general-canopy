@@ -44,7 +44,7 @@ class SaplingCard extends StatelessWidget {
                                       : null,
                                 ),
                               ),
-                        errorBuilder: (_, __, ___) => Center(
+                        errorBuilder: (_, _, _) => Center(
                           child: Icon(
                             Icons.park,
                             size: 80,

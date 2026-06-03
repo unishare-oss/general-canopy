@@ -142,7 +142,7 @@ class _SaplingDetailBodyState extends ConsumerState<_SaplingDetailBody> {
                                     : null,
                               ),
                             ),
-                      errorBuilder: (_, __, ___) => Center(
+                      errorBuilder: (_, _, _) => Center(
                         child: Icon(Icons.park, size: 80, color: cs.onPrimary),
                       ),
                     )
@@ -269,7 +269,7 @@ class _SaplingDetailBodyState extends ConsumerState<_SaplingDetailBody> {
                         ),
                         onPressed: _isUnadopting
                             ? null
-                            : () => _handleUnadopt(currentUid!),
+                            : () => _handleUnadopt(currentUid),
                       ),
                     ),
                   ],

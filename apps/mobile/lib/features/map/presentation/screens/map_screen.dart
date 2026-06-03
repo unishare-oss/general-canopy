@@ -272,7 +272,7 @@ class _AdopterAvatar extends StatelessWidget {
       child: Image.network(
         photoUrl!,
         fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) =>
+        errorBuilder: (_, _, _) =>
             const Icon(Icons.person, size: 20, color: Colors.white),
         loadingBuilder: (_, child, progress) => progress == null
             ? child

@@ -67,6 +67,7 @@ class FirestoreSaplingDatasourceImpl implements FirestoreSaplingDatasource {
         'status': 'adopted',
         'adoptedBy': uid,
         'adoptedByName': displayName,
+        // ignore: use_null_aware_elements
         if (photoUrl != null) 'adoptedByPhotoUrl': photoUrl,
         'adoptedAt': FieldValue.serverTimestamp(),
       });
