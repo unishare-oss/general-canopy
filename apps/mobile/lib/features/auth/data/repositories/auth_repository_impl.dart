@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
+import 'package:flutter/foundation.dart';
 
+import 'package:canopy/features/auth/data/models/app_user_model.dart';
 import 'package:canopy/features/auth/domain/entities/app_user.dart';
 import 'package:canopy/features/auth/domain/entities/check_in_frequency.dart';
 import 'package:canopy/features/auth/domain/entities/notification_preferences.dart';
@@ -31,10 +33,17 @@ class AuthRepositoryImpl implements AuthRepository {
         );
       }
       final providerIds = _providerIds(firebaseUser);
-      final model = await _firestore.getUser(firebaseUser.uid);
+      AppUserModel? model;
+      try {
+        model = await _firestore.getUser(firebaseUser.uid);
+      } catch (e) {
+        // Firestore read failed (e.g. rules not deployed, network error).
+        // Fall back to Firebase Auth data so the stream stays healthy.
+        debugPrint('authStateChanges: Firestore read failed: $e');
+      }
       // Fall back to Firebase Auth data if the Firestore document doesn't
-      // exist yet (new-user race condition) or was never created.
-      // onboardingComplete defaults to false, triggering the onboarding quiz.
+      // exist yet (new-user race condition), was never created, or could not
+      // be read. onboardingComplete defaults to false, triggering the quiz.
       return model?.toEntity(providerIds: providerIds) ??
           AppUser(
             id: firebaseUser.uid,

@@ -140,3 +140,10 @@ Files:
 Summary:  2 files changed, 5 insertions(+), 4 deletions(-)
 
   [12:10] Edit: apps/mobile/lib/features/auth/presentation/screens/welcome_screen.dart
+  [12:37] Write: apps/mobile/lib/shared/constants/neighborhoods.dart
+  [13:10] Edit: apps/mobile/lib/features/auth/data/repositories/auth_repository_impl.dart
+  [13:10] Edit: apps/mobile/lib/features/auth/data/repositories/auth_repository_impl.dart
+Files:
+  ~ apps/mobile/lib/features/auth/data/repositories/auth_repository_impl.dart
+Summary:  1 file changed, 12 insertions(+), 3 deletions(-)
+
