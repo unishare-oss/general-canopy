@@ -4,6 +4,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'package:canopy/features/auth/presentation/providers/auth_state_provider.dart';
 import 'package:canopy/features/auth/presentation/providers/guest_mode_provider.dart';
+import 'package:canopy/features/auth/presentation/providers/onboarding_provider.dart';
+import 'package:canopy/features/auth/presentation/screens/onboarding_screen.dart';
 import 'package:canopy/features/auth/presentation/screens/welcome_screen.dart';
 import 'package:canopy/core/router/shell_scaffold.dart';
 import 'package:canopy/features/discover/presentation/screens/discover_screen.dart';
@@ -15,8 +17,8 @@ import 'package:canopy/features/you/presentation/screens/you_screen.dart';
 part 'router.g.dart';
 
 // ---------------------------------------------------------------------------
-// Notifier — watches auth + guest state, calls notifyListeners on change so
-// GoRouter re-evaluates redirects when the session changes.
+// Notifier — watches auth + guest + onboarding state, calls notifyListeners
+// on change so GoRouter re-evaluates redirects when the session changes.
 // ---------------------------------------------------------------------------
 
 class _RouterNotifier extends ChangeNotifier {
@@ -26,6 +28,10 @@ class _RouterNotifier extends ChangeNotifier {
       (prev, next) => notifyListeners(),
     );
     _ref.listen<bool>(guestModeProvider, (prev, next) => notifyListeners());
+    _ref.listen<OnboardingState>(
+      onboardingProvider,
+      (prev, next) => notifyListeners(),
+    );
   }
 
   final Ref _ref;
@@ -38,33 +44,41 @@ class _RouterNotifier extends ChangeNotifier {
     // deep link isn't bounced to /welcome before auth resolves.
     if (!authAsync.hasValue) return null;
 
-    final isAuthenticated = authAsync.value != null;
-    const authRoutes = {'/welcome'};
+    final user = authAsync.value;
+    final isAuthenticated = user != null && !user.isAnonymous;
     final currentPath = state.uri.path;
+    const authRoutes = {'/welcome', '/onboarding'};
 
-    // 1. No session and not a guest → force /welcome, preserving the URL.
+    // Case 1: No session and not a guest → force /welcome, preserving the URL.
     if (!isAuthenticated && !isGuest) {
       if (!authRoutes.contains(currentPath)) {
-        final encoded = Uri.encodeComponent(state.uri.toString());
-        return '/welcome?redirect=$encoded';
+        return '/welcome?redirect=${Uri.encodeComponent(currentPath)}';
       }
       return null;
     }
 
-    // 2. Authenticated/guest sitting on /welcome → honour redirect or go home.
-    if ((isAuthenticated || isGuest) && authRoutes.contains(currentPath)) {
+    // Case 2: Authenticated but onboarding not complete → /onboarding.
+    // Guest users are exempt — they have no Firestore document.
+    if (isAuthenticated && user.onboardingComplete == false) {
+      return currentPath == '/onboarding' ? null : '/onboarding';
+    }
+
+    // Case 3: Authenticated + onboarding complete, sitting on an auth route
+    // → honour redirect param or default to /grove.
+    if (isAuthenticated && authRoutes.contains(currentPath)) {
       final redirectParam = state.uri.queryParameters['redirect'];
-      if (redirectParam != null && redirectParam.isNotEmpty) {
-        final decoded = Uri.decodeComponent(redirectParam);
-        // Only follow in-app paths to prevent open-redirect abuse.
-        if (decoded.startsWith('/') && !decoded.contains('://')) {
-          return decoded;
-        }
+      if (redirectParam != null &&
+          redirectParam.startsWith('/') &&
+          !redirectParam.contains('://')) {
+        return redirectParam;
       }
       return '/grove';
     }
 
-    // 3. Root → /grove.
+    // Guest on /welcome → /grove.
+    if (isGuest && currentPath == '/welcome') return '/grove';
+
+    // Root → /grove.
     if (currentPath == '/') return '/grove';
 
     return null;
@@ -88,6 +102,10 @@ GoRouter router(Ref ref) {
       GoRoute(
         path: '/welcome',
         builder: (context, state) => const WelcomeScreen(),
+      ),
+      GoRoute(
+        path: '/onboarding',
+        builder: (context, state) => const OnboardingScreen(),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
