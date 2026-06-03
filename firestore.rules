@@ -13,6 +13,22 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // ── Adoptions (My Grove) ─────────────────────────────────────────────
+    match /users/{userId}/adoptions/{adoptionId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if false;
+
+      match /photos/{photoId} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+        allow write: if false;
+      }
+
+      match /history/{historyId} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+        allow write: if false;
+      }
+    }
+
     // ── Default deny ──────────────────────────────────────────────────────
     // Every other collection is locked down until you add an explicit rule.
     // Add new `match` blocks above this line as you build features.
