@@ -25,10 +25,18 @@ class _FakeSaplingRepository implements SaplingRepository {
   Future<void> adoptSapling({
     required String saplingId,
     required String uid,
+    required String displayName,
+    String? photoUrl,
   }) async {
     capturedSaplingId = saplingId;
     capturedUid = uid;
   }
+
+  @override
+  Future<void> unadoptSapling({
+    required String saplingId,
+    required String uid,
+  }) => throw UnimplementedError();
 }
 
 // ---------------------------------------------------------------------------
@@ -43,7 +51,11 @@ void main() {
         final repo = _FakeSaplingRepository();
         final useCase = AdoptSapling(repo);
 
-        await useCase(saplingId: 'sapling-42', uid: 'user-99');
+        await useCase(
+          saplingId: 'sapling-42',
+          uid: 'user-99',
+          displayName: 'Test User',
+        );
 
         expect(repo.capturedSaplingId, 'sapling-42');
         expect(repo.capturedUid, 'user-99');
@@ -56,7 +68,7 @@ void main() {
       final useCase = AdoptSapling(throwingRepo);
 
       expect(
-        () => useCase(saplingId: 'id', uid: 'uid'),
+        () => useCase(saplingId: 'id', uid: 'uid', displayName: 'User'),
         throwsA(isA<Exception>()),
       );
     });
@@ -74,7 +86,19 @@ class _ThrowingRepo implements SaplingRepository {
   Future<Sapling> getSaplingById(String id) => throw UnimplementedError();
 
   @override
-  Future<void> adoptSapling({required String saplingId, required String uid}) {
+  Future<void> adoptSapling({
+    required String saplingId,
+    required String uid,
+    required String displayName,
+    String? photoUrl,
+  }) {
     throw Exception('Network error');
   }
+
+  @override
+  Future<void> unadoptSapling({
+    required String saplingId,
+    required String uid,
+  }) => throw UnimplementedError();
 }
+

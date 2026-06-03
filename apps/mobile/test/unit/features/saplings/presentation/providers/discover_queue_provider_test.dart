@@ -29,12 +29,21 @@ class _FakeSaplingRepository implements SaplingRepository {
   Future<void> adoptSapling({
     required String saplingId,
     required String uid,
+    required String displayName,
+    String? photoUrl,
   }) async {
     adoptedSaplingId = saplingId;
     if (throwAlreadyAdopted) throw const SaplingAlreadyAdoptedException();
     if (throwOnAdopt) throw Exception('Generic error');
   }
+
+  @override
+  Future<void> unadoptSapling({
+    required String saplingId,
+    required String uid,
+  }) => throw UnimplementedError();
 }
+
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -131,7 +140,7 @@ void main() {
 
       await container
           .read(discoverQueueProvider.notifier)
-          .adopt(saplingId: 'tree-1', uid: 'user-uid');
+          .adopt(saplingId: 'tree-1', uid: 'user-uid', displayName: 'Test User');
 
       final state = container.read(discoverQueueProvider);
       expect(state.isAdopting, isFalse);
@@ -147,7 +156,7 @@ void main() {
 
       await container
           .read(discoverQueueProvider.notifier)
-          .adopt(saplingId: 'tree-3', uid: 'user-uid');
+          .adopt(saplingId: 'tree-3', uid: 'user-uid', displayName: 'Test User');
 
       final state = container.read(discoverQueueProvider);
       expect(state.isAdopting, isFalse);
@@ -162,7 +171,7 @@ void main() {
 
       await container
           .read(discoverQueueProvider.notifier)
-          .adopt(saplingId: 'tree-4', uid: 'user-uid');
+          .adopt(saplingId: 'tree-4', uid: 'user-uid', displayName: 'Test User');
 
       final state = container.read(discoverQueueProvider);
       expect(state.adoptError, isNotNull);
@@ -176,7 +185,7 @@ void main() {
 
       await container
           .read(discoverQueueProvider.notifier)
-          .adopt(saplingId: 'tree-5', uid: 'uid');
+          .adopt(saplingId: 'tree-5', uid: 'uid', displayName: 'Test User');
 
       // Confirm error is set.
       expect(container.read(discoverQueueProvider).adoptError, isNotNull);

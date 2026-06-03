@@ -40,8 +40,17 @@ class _NoopSaplingRepository implements SaplingRepository {
   Future<void> adoptSapling({
     required String saplingId,
     required String uid,
+    required String displayName,
+    String? photoUrl,
   }) async {}
+
+  @override
+  Future<void> unadoptSapling({
+    required String saplingId,
+    required String uid,
+  }) => throw UnimplementedError();
 }
+
 
 // ---------------------------------------------------------------------------
 // Helpers

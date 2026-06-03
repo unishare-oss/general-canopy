@@ -43,12 +43,20 @@ class _FakeDatasource implements FirestoreSaplingDatasource {
   Future<void> adoptSapling({
     required String saplingId,
     required String uid,
+    required String displayName,
+    String? photoUrl,
   }) async {
     if (throwOnAdopt) throw const SaplingAlreadyAdoptedException();
     adoptCalled = true;
     adoptedSaplingId = saplingId;
     adoptedUid = uid;
   }
+
+  @override
+  Future<void> unadoptSapling({
+    required String saplingId,
+    required String uid,
+  }) => throw UnimplementedError();
 }
 
 // ---------------------------------------------------------------------------
@@ -114,7 +122,11 @@ void main() {
       final datasource = _FakeDatasource();
       final repo = SaplingRepositoryImpl(datasource);
 
-      await repo.adoptSapling(saplingId: 'tree-99', uid: 'user-55');
+      await repo.adoptSapling(
+        saplingId: 'tree-99',
+        uid: 'user-55',
+        displayName: 'Test User',
+      );
 
       expect(datasource.adoptCalled, isTrue);
       expect(datasource.adoptedSaplingId, 'tree-99');
@@ -126,7 +138,11 @@ void main() {
       final repo = SaplingRepositoryImpl(datasource);
 
       await expectLater(
-        repo.adoptSapling(saplingId: 'tree-99', uid: 'user-55'),
+        repo.adoptSapling(
+          saplingId: 'tree-99',
+          uid: 'user-55',
+          displayName: 'Test User',
+        ),
         throwsA(isA<SaplingAlreadyAdoptedException>()),
       );
     });

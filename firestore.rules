@@ -22,9 +22,17 @@ service cloud.firestore {
 
       allow update: if request.auth != null
         && request.auth.token.firebase.sign_in_provider != 'anonymous'
-        && resource.data.status == 'available'
-        && request.resource.data.status == 'adopted'
-        && request.resource.data.adoptedBy == request.auth.uid;
+        && (
+          // Adoption: available → adopted by the requesting user
+          (resource.data.status == 'available'
+            && request.resource.data.status == 'adopted'
+            && request.resource.data.adoptedBy == request.auth.uid)
+          ||
+          // Unadoption: adopted → available by the current adopter only
+          (resource.data.status == 'adopted'
+            && resource.data.adoptedBy == request.auth.uid
+            && request.resource.data.status == 'available')
+        );
 
       allow create: if false;
       allow delete: if false;

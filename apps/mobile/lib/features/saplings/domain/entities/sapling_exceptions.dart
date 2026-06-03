@@ -6,3 +6,7 @@ class SaplingNotFoundException implements Exception {
 class SaplingAlreadyAdoptedException implements Exception {
   const SaplingAlreadyAdoptedException();
 }
+
+class SaplingNotAdoptedByUserException implements Exception {
+  const SaplingNotAdoptedByUserException();
+}
