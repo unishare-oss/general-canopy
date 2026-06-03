@@ -6,7 +6,13 @@ abstract interface class FirestoreSaplingDatasource {
   Stream<List<(String id, SaplingModel model)>> watchAvailableSaplings();
   Stream<List<(String id, SaplingModel model)>> watchAllSaplings();
   Future<(String id, SaplingModel model)> getSaplingById(String id);
-  Future<void> adoptSapling({required String saplingId, required String uid});
+  Future<void> adoptSapling({
+    required String saplingId,
+    required String uid,
+    required String displayName,
+    String? photoUrl,
+  });
+  Future<void> unadoptSapling({required String saplingId, required String uid});
 }
 
 class FirestoreSaplingDatasourceImpl implements FirestoreSaplingDatasource {
@@ -48,6 +54,8 @@ class FirestoreSaplingDatasourceImpl implements FirestoreSaplingDatasource {
   Future<void> adoptSapling({
     required String saplingId,
     required String uid,
+    required String displayName,
+    String? photoUrl,
   }) async {
     await _firestore.runTransaction((txn) async {
       final ref = _saplings.doc(saplingId);
@@ -58,7 +66,33 @@ class FirestoreSaplingDatasourceImpl implements FirestoreSaplingDatasource {
       txn.update(ref, {
         'status': 'adopted',
         'adoptedBy': uid,
+        'adoptedByName': displayName,
+        if (photoUrl != null) 'adoptedByPhotoUrl': photoUrl,
         'adoptedAt': FieldValue.serverTimestamp(),
+      });
+    });
+  }
+
+  @override
+  Future<void> unadoptSapling({
+    required String saplingId,
+    required String uid,
+  }) async {
+    await _firestore.runTransaction((txn) async {
+      final ref = _saplings.doc(saplingId);
+      final snapshot = await txn.get(ref);
+      final data = snapshot.data();
+      if (!snapshot.exists ||
+          data?['status'] != 'adopted' ||
+          data?['adoptedBy'] != uid) {
+        throw const SaplingNotAdoptedByUserException();
+      }
+      txn.update(ref, {
+        'status': 'available',
+        'adoptedBy': FieldValue.delete(),
+        'adoptedByName': FieldValue.delete(),
+        'adoptedByPhotoUrl': FieldValue.delete(),
+        'adoptedAt': FieldValue.delete(),
       });
     });
   }

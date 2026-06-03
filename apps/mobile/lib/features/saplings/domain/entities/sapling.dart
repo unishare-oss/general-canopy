@@ -20,6 +20,8 @@ class Sapling {
     required this.status,
     this.photoUrl,
     this.adoptedBy,
+    this.adoptedByName,
+    this.adoptedByPhotoUrl,
   });
 
   final String id;
@@ -40,6 +42,8 @@ class Sapling {
   final SaplingStatus status;
   final String? photoUrl;
   final String? adoptedBy;
+  final String? adoptedByName;
+  final String? adoptedByPhotoUrl;
 
   bool get isAvailable => status == SaplingStatus.available;
 }

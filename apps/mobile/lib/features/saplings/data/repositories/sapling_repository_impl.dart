@@ -23,6 +23,21 @@ class SaplingRepositoryImpl implements SaplingRepository {
   }
 
   @override
-  Future<void> adoptSapling({required String saplingId, required String uid}) =>
-      _datasource.adoptSapling(saplingId: saplingId, uid: uid);
+  Future<void> adoptSapling({
+    required String saplingId,
+    required String uid,
+    required String displayName,
+    String? photoUrl,
+  }) => _datasource.adoptSapling(
+    saplingId: saplingId,
+    uid: uid,
+    displayName: displayName,
+    photoUrl: photoUrl,
+  );
+
+  @override
+  Future<void> unadoptSapling({
+    required String saplingId,
+    required String uid,
+  }) => _datasource.unadoptSapling(saplingId: saplingId, uid: uid);
 }

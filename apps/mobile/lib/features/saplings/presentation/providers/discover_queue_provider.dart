@@ -55,12 +55,19 @@ class DiscoverQueueNotifier extends _$DiscoverQueueNotifier {
     );
   }
 
-  Future<void> adopt({required String saplingId, required String uid}) async {
+  Future<void> adopt({
+    required String saplingId,
+    required String uid,
+    required String displayName,
+    String? photoUrl,
+  }) async {
     state = state.copyWith(isAdopting: true, clearAdoptError: true);
     try {
       await AdoptSapling(ref.read(saplingRepositoryProvider))(
         saplingId: saplingId,
         uid: uid,
+        displayName: displayName,
+        photoUrl: photoUrl,
       );
       state = state.copyWith(
         isAdopting: false,

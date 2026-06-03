@@ -26,6 +26,8 @@ abstract class SaplingModel with _$SaplingModel {
     @Default(3) int wateringIntervalDays,
     @Default('available') String status,
     String? adoptedBy,
+    String? adoptedByName,
+    String? adoptedByPhotoUrl,
   }) = _SaplingModel;
 
   factory SaplingModel.fromJson(Map<String, dynamic> json) =>
@@ -55,5 +57,7 @@ abstract class SaplingModel with _$SaplingModel {
     },
     photoUrl: photoUrl,
     adoptedBy: adoptedBy,
+    adoptedByName: adoptedByName,
+    adoptedByPhotoUrl: adoptedByPhotoUrl,
   );
 }
