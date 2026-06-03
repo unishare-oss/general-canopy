@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import 'package:canopy/features/auth/domain/entities/app_user.dart';
+import 'package:canopy/features/auth/domain/entities/check_in_frequency.dart';
+import 'package:canopy/features/auth/domain/entities/notification_preferences.dart';
+import 'package:canopy/features/auth/domain/entities/plant_experience.dart';
 
 part 'app_user_model.freezed.dart';
 part 'app_user_model.g.dart';
@@ -15,11 +18,12 @@ abstract class AppUserModel with _$AppUserModel {
     required String name,
     required String email,
     String? photoUrl,
-    String? universityId,
-    String? departmentId,
-    int? enrollmentYear,
-    String? bio,
-    @Default('student') String role,
+    String? neighborhood,
+    String? checkInFrequency, // serialised enum name
+    String? plantExperience, // serialised enum name
+    @Default(false) bool wateringReminders,
+    @Default(false) bool cityAlerts,
+    @Default(false) bool onboardingComplete,
   }) = _AppUserModel;
 
   factory AppUserModel.fromJson(Map<String, dynamic> json) =>
@@ -29,16 +33,19 @@ abstract class AppUserModel with _$AppUserModel {
     DocumentSnapshot<Map<String, dynamic>> doc,
   ) {
     final data = doc.data()!;
+    final prefs =
+        data['notificationPreferences'] as Map<String, dynamic>? ?? {};
     return AppUserModel(
       id: doc.id,
       name: data['name'] as String? ?? '',
       email: data['email'] as String? ?? '',
       photoUrl: data['photoUrl'] as String?,
-      universityId: data['universityId'] as String?,
-      departmentId: data['departmentId'] as String?,
-      enrollmentYear: data['enrollmentYear'] as int?,
-      bio: data['bio'] as String?,
-      role: data['role'] as String? ?? 'student',
+      neighborhood: data['neighborhood'] as String?,
+      checkInFrequency: data['checkInFrequency'] as String?,
+      plantExperience: data['plantExperience'] as String?,
+      wateringReminders: prefs['wateringReminders'] as bool? ?? false,
+      cityAlerts: prefs['cityAlerts'] as bool? ?? false,
+      onboardingComplete: data['onboardingComplete'] as bool? ?? false,
     );
   }
 
@@ -47,11 +54,18 @@ abstract class AppUserModel with _$AppUserModel {
     name: name,
     email: email,
     photoUrl: photoUrl,
-    universityId: universityId,
-    departmentId: departmentId,
-    enrollmentYear: enrollmentYear,
-    bio: bio,
-    role: role,
+    neighborhood: neighborhood,
+    checkInFrequency: checkInFrequency != null
+        ? CheckInFrequency.values.firstWhere((e) => e.name == checkInFrequency)
+        : null,
+    plantExperience: plantExperience != null
+        ? PlantExperience.values.firstWhere((e) => e.name == plantExperience)
+        : null,
+    notificationPreferences: NotificationPreferences(
+      wateringReminders: wateringReminders,
+      cityAlerts: cityAlerts,
+    ),
+    onboardingComplete: onboardingComplete,
     providerIds: providerIds,
   );
 }

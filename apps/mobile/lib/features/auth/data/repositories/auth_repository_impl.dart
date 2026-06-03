@@ -1,6 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart' show User;
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 
 import 'package:canopy/features/auth/domain/entities/app_user.dart';
+import 'package:canopy/features/auth/domain/entities/check_in_frequency.dart';
+import 'package:canopy/features/auth/domain/entities/notification_preferences.dart';
+import 'package:canopy/features/auth/domain/entities/plant_experience.dart';
 import 'package:canopy/features/auth/domain/repositories/auth_repository.dart';
 import 'package:canopy/features/auth/data/datasources/firebase_auth_datasource.dart';
 import 'package:canopy/features/auth/data/datasources/firestore_user_datasource.dart';
@@ -31,7 +34,7 @@ class AuthRepositoryImpl implements AuthRepository {
       final model = await _firestore.getUser(firebaseUser.uid);
       // Fall back to Firebase Auth data if the Firestore document doesn't
       // exist yet (new-user race condition) or was never created.
-      // departmentId=null triggers the academic profile prompt on first launch.
+      // onboardingComplete defaults to false, triggering the onboarding quiz.
       return model?.toEntity(providerIds: providerIds) ??
           AppUser(
             id: firebaseUser.uid,
@@ -39,11 +42,12 @@ class AuthRepositoryImpl implements AuthRepository {
             email: firebaseUser.email ?? '',
             photoUrl: firebaseUser.photoURL,
             providerIds: providerIds,
+            onboardingComplete: false,
           );
     });
   }
 
-  List<String> _providerIds(User user) =>
+  List<String> _providerIds(firebase_auth.User user) =>
       user.providerData.map((p) => p.providerId).toList(growable: false);
 
   @override
@@ -84,6 +88,7 @@ class AuthRepositoryImpl implements AuthRepository {
         email: firebaseUser.email ?? '',
         photoUrl: firebaseUser.photoURL,
         providerIds: providerIds,
+        onboardingComplete: false,
       );
     }
 
@@ -110,7 +115,6 @@ class AuthRepositoryImpl implements AuthRepository {
     required String name,
     required String email,
     required String password,
-    String? universityId,
   }) async {
     final credential = await _auth.createUserWithEmailAndPassword(
       email: email,
@@ -119,23 +123,17 @@ class AuthRepositoryImpl implements AuthRepository {
     final uid = credential.user!.uid;
 
     // Set displayName on the Firebase Auth profile so it's available
-    // when creating posts (PostRepositoryImpl reads user.displayName).
+    // when other features read user.displayName.
     await credential.user!.updateDisplayName(name);
 
-    await _firestore.createUser(
-      uid: uid,
-      name: name,
-      email: email,
-      universityId: universityId,
-      withConsent: true,
-    );
+    await _firestore.createUser(uid: uid, name: name, email: email);
 
     return AppUser(
       id: uid,
       name: name,
       email: email,
-      universityId: universityId,
       providerIds: _providerIds(credential.user!),
+      onboardingComplete: false,
     );
   }
 
@@ -160,30 +158,41 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> updateProfile({
+  Future<void> updateUserProfile({
     required String uid,
-    required String name,
-    String? bio,
-    String? universityId,
-    String? departmentId,
-    int? enrollmentYear,
-  }) => _firestore.updateProfile(
+    String? name,
+    String? neighborhood,
+    CheckInFrequency? checkInFrequency,
+    PlantExperience? plantExperience,
+    NotificationPreferences? notificationPreferences,
+    bool? onboardingComplete,
+  }) => _firestore.updateUserProfile(
     uid: uid,
     name: name,
-    bio: bio,
-    universityId: universityId,
-    departmentId: departmentId,
-    enrollmentYear: enrollmentYear,
+    neighborhood: neighborhood,
+    checkInFrequency: checkInFrequency,
+    plantExperience: plantExperience,
+    notificationPreferences: notificationPreferences,
+    onboardingComplete: onboardingComplete,
   );
 
   @override
-  Future<void> updateAcademicProfile({
+  Future<AppUser> linkAnonymousAccount({
     required String uid,
-    required String departmentId,
-    int? enrollmentYear,
-  }) => _firestore.updateAcademicProfile(
-    uid: uid,
-    departmentId: departmentId,
-    enrollmentYear: enrollmentYear,
-  );
+    required Object credential,
+  }) async {
+    final authCredential = credential as firebase_auth.AuthCredential;
+    final userCredential = await _auth.linkWithCredential(authCredential);
+    final firebaseUser = userCredential.user!;
+    final providerIds = _providerIds(firebaseUser);
+    final model = await _firestore.getUser(firebaseUser.uid);
+    return model?.toEntity(providerIds: providerIds) ??
+        AppUser(
+          id: firebaseUser.uid,
+          name: firebaseUser.displayName ?? '',
+          email: firebaseUser.email ?? '',
+          photoUrl: firebaseUser.photoURL,
+          providerIds: providerIds,
+        );
+  }
 }

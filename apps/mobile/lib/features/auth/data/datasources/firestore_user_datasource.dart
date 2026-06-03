@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:canopy/features/auth/data/models/app_user_model.dart';
+import 'package:canopy/features/auth/domain/entities/check_in_frequency.dart';
+import 'package:canopy/features/auth/domain/entities/notification_preferences.dart';
+import 'package:canopy/features/auth/domain/entities/plant_experience.dart';
 
 class FirestoreUserDatasource {
   FirestoreUserDatasource({FirebaseFirestore? firestore})
@@ -11,15 +14,8 @@ class FirestoreUserDatasource {
   CollectionReference<Map<String, dynamic>> get _users =>
       _firestore.collection('users');
 
-  CollectionReference<Map<String, dynamic>> get _universities =>
-      _firestore.collection('universities');
-
-  CollectionReference<Map<String, dynamic>> get _departments =>
-      _firestore.collection('departments');
-
   Future<AppUserModel?> getUser(String uid) async {
-    final ref = _users.doc(uid);
-    final doc = await ref.get();
+    final doc = await _users.doc(uid).get();
     if (!doc.exists) return null;
     return AppUserModel.fromFirestore(doc);
   }
@@ -29,92 +25,49 @@ class FirestoreUserDatasource {
     required String name,
     required String email,
     String? photoUrl,
-    String? universityId,
-    bool withConsent = false,
   }) async {
     await _users.doc(uid).set({
       'name': name,
       'email': email,
-      'photoUrl': ?photoUrl,
-      'universityId': ?universityId,
-      'role': 'student',
+      // ignore: use_null_aware_elements
+      if (photoUrl != null) 'photoUrl': photoUrl,
+      'onboardingComplete': false,
+      'notificationPreferences': {
+        'wateringReminders': false,
+        'cityAlerts': false,
+      },
       'createdAt': FieldValue.serverTimestamp(),
-      if (withConsent) 'consentGivenAt': FieldValue.serverTimestamp(),
     });
   }
 
-  Future<void> updateProfile({
+  Future<void> updateUserProfile({
     required String uid,
-    required String name,
-    String? bio,
-    String? universityId,
-    String? departmentId,
-    int? enrollmentYear,
+    String? name,
+    String? neighborhood,
+    CheckInFrequency? checkInFrequency,
+    PlantExperience? plantExperience,
+    NotificationPreferences? notificationPreferences,
+    bool? onboardingComplete,
   }) async {
-    // Write nulls explicitly so users can *clear* a field — e.g., switching
-    // university to one we haven't seeded should also clear the dept.
-    // Firestore writes `null` (rather than omitting the field) for these.
-    await _users.doc(uid).update({
-      'name': name,
-      'bio': bio,
-      'universityId': universityId,
-      'departmentId': departmentId,
-      'enrollmentYear': enrollmentYear,
-    });
-  }
-
-  Future<void> updateAcademicProfile({
-    required String uid,
-    required String departmentId,
-    int? enrollmentYear,
-  }) async {
-    await _users.doc(uid).update({
-      'departmentId': departmentId,
-      'enrollmentYear': ?enrollmentYear,
-    });
-  }
-
-  Stream<List<({String id, String name})>> getUniversities() {
-    return Stream.fromFuture(
-      _universities.get().then(
-        (snap) => snap.docs
-            .map(
-              (doc) => (id: doc.id, name: doc.data()['name'] as String? ?? ''),
-            )
-            .toList(),
-      ),
-    );
-  }
-
-  Stream<List<({String id, String name})>> getDepartments() {
-    return Stream.fromFuture(
-      _departments.get().then(
-        (snap) => snap.docs
-            .map(
-              (doc) => (id: doc.id, name: doc.data()['name'] as String? ?? ''),
-            )
-            .toList(),
-      ),
-    );
-  }
-
-  /// Returns only departments belonging to the given university.
-  /// Server-side filter (avoids streaming the full department list).
-  Stream<List<({String id, String name})>> getDepartmentsForUniversity(
-    String universityId,
-  ) {
-    return Stream.fromFuture(
-      _departments
-          .where('universityId', isEqualTo: universityId)
-          .get()
-          .then(
-            (snap) => snap.docs
-                .map(
-                  (doc) =>
-                      (id: doc.id, name: doc.data()['name'] as String? ?? ''),
-                )
-                .toList(),
-          ),
-    );
+    final data = <String, dynamic>{};
+    if (name != null) data['name'] = name;
+    if (neighborhood != null) data['neighborhood'] = neighborhood;
+    if (checkInFrequency != null) {
+      data['checkInFrequency'] = checkInFrequency.name;
+    }
+    if (plantExperience != null) {
+      data['plantExperience'] = plantExperience.name;
+    }
+    if (notificationPreferences != null) {
+      data['notificationPreferences'] = {
+        'wateringReminders': notificationPreferences.wateringReminders,
+        'cityAlerts': notificationPreferences.cityAlerts,
+      };
+    }
+    if (onboardingComplete != null) {
+      data['onboardingComplete'] = onboardingComplete;
+    }
+    if (data.isEmpty) return;
+    await _users.doc(uid).update(data);
   }
 }

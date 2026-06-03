@@ -79,13 +79,22 @@ class FirebaseAuthDatasource {
     ]);
   }
 
+  Future<UserCredential> linkWithCredential(AuthCredential credential) async {
+    try {
+      final user = _firebaseAuth.currentUser;
+      if (user == null) throw const AuthException(AuthFailureType.unknown);
+      return await user.linkWithCredential(credential);
+    } on FirebaseAuthException catch (e) {
+      throw _mapException(e);
+    }
+  }
+
   AuthException _mapException(FirebaseAuthException e) {
     return switch (e.code) {
       'wrong-password' || 'user-not-found' || 'invalid-credential' =>
         const AuthException(AuthFailureType.invalidCredentials),
-      'email-already-in-use' => const AuthException(
-        AuthFailureType.emailAlreadyInUse,
-      ),
+      'email-already-in-use' || 'credential-already-in-use' =>
+        const AuthException(AuthFailureType.emailAlreadyInUse),
       'network-request-failed' => const AuthException(
         AuthFailureType.networkError,
       ),
