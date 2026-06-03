@@ -76,7 +76,13 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                 child: SaplingCardStack(
                   saplings: queueState.queue,
                   isDisabled: queueState.isAdopting,
-                  onTap: (sapling) => context.push('/sapling/${sapling.id}'),
+                  onTap: (sapling) async {
+                    final adopted =
+                        await context.push<bool>('/sapling/${sapling.id}');
+                    if (adopted == true && mounted) {
+                      setState(() => _view = DiscoverView.map);
+                    }
+                  },
                   onSwipeLeft: (sapling) =>
                       ref.read(discoverQueueProvider.notifier).pass(sapling.id),
                   onSwipeRight: (sapling) async {
@@ -91,6 +97,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                     if (context.mounted &&
                         ref.read(discoverQueueProvider).adoptError == null) {
                       await AdoptConfirmationSheet.show(context, sapling);
+                      if (mounted) setState(() => _view = DiscoverView.map);
                     }
                   },
                 ),

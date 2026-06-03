@@ -33,7 +33,7 @@ class _SaplingMap extends StatelessWidget {
 
     final markers = saplings.map((s) {
       final color = Color(int.parse('0xFF${s.colorHex.replaceFirst('#', '')}'));
-      final opacity = s.isAvailable ? 1.0 : 0.4;
+      final isAdopted = !s.isAvailable;
       return Marker(
         point: LatLng(s.lat, s.lng),
         width: 36,
@@ -41,7 +41,7 @@ class _SaplingMap extends StatelessWidget {
         child: GestureDetector(
           onTap: () => context.push('/sapling/${s.id}'),
           child: Opacity(
-            opacity: opacity,
+            opacity: isAdopted ? 0.4 : 1.0,
             child: Container(
               decoration: BoxDecoration(
                 color: color,
@@ -51,7 +51,11 @@ class _SaplingMap extends StatelessWidget {
                   BoxShadow(color: Colors.black26, blurRadius: 4),
                 ],
               ),
-              child: const Icon(Icons.park, size: 18, color: Colors.white),
+              child: Icon(
+                isAdopted ? Icons.favorite : Icons.park,
+                size: 18,
+                color: Colors.white,
+              ),
             ),
           ),
         ),

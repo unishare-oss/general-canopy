@@ -154,6 +154,9 @@ class _SaplingDetailBody extends ConsumerWidget {
                                   context,
                                   sapling,
                                 );
+                                // Pop back to the caller (e.g. DiscoverScreen)
+                                // with true so it can switch to the map view.
+                                if (context.mounted) context.pop(true);
                               }
                             },
                     ),
