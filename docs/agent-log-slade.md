@@ -269,3 +269,14 @@ Files:
 Summary:  4 files changed, 178 insertions(+), 10 deletions(-)
 
   [15:08] Edit: apps/mobile/lib/features/discover/presentation/widgets/sapling_card.dart
+  [15:26] Write: apps/mobile/test/unit/features/saplings/domain/usecases/get_available_saplings_test.dart
+  [15:26] Write: apps/mobile/test/unit/features/saplings/domain/usecases/adopt_sapling_test.dart
+  [15:26] Write: apps/mobile/test/unit/features/saplings/domain/usecases/get_sapling_by_id_test.dart
+  [15:26] Write: apps/mobile/test/unit/features/saplings/data/models/sapling_model_test.dart
+  [15:27] Write: apps/mobile/test/unit/features/saplings/data/repositories/sapling_repository_impl_test.dart
+  [15:27] Write: apps/mobile/test/unit/features/saplings/presentation/providers/discover_queue_provider_test.dart
+  [15:28] Write: apps/mobile/test/widget/features/discover/presentation/screens/discover_screen_test.dart
+  [15:28] Write: apps/mobile/test/widget/features/discover/presentation/screens/discover_screen_test.dart
+  [15:28] Write: apps/mobile/test/widget/features/discover/presentation/screens/sapling_detail_screen_test.dart
+  [15:29] Write: apps/mobile/test/widget/features/map/presentation/screens/map_screen_test.dart
+  [15:31] Edit: apps/mobile/test/unit/features/saplings/domain/usecases/adopt_sapling_test.dart
