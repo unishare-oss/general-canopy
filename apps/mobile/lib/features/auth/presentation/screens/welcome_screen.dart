@@ -100,7 +100,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       );
     } on AuthException catch (e) {
       if (mounted) setState(() => _serverError = e.userMessage);
-    } catch (_) {
+    } catch (e, st) {
+      debugPrint('Sign-up error: $e\n$st');
       if (mounted) setState(() => _serverError = 'Something went wrong. Please try again.');
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -211,7 +212,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           const SizedBox(height: 16),
 
           if (isSignUp) ...[
-            AuthTextField(label: 'Name', hint: 'Jane Smith', controller: _nameController,
+            AuthTextField(key: const ValueKey('name'), label: 'Name', hint: 'Jane Smith', controller: _nameController,
               keyboardType: TextInputType.name, textInputAction: TextInputAction.next,
               autofillHints: const [AutofillHints.name],
               validator: (v) {
@@ -222,7 +223,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
             const SizedBox(height: 10),
           ],
 
-          AuthTextField(label: 'Email', hint: 'you@example.com', controller: _emailController,
+          AuthTextField(key: const ValueKey('email'), label: 'Email', hint: 'you@example.com', controller: _emailController,
             keyboardType: TextInputType.emailAddress, textInputAction: TextInputAction.next,
             autofillHints: const [AutofillHints.email],
             validator: (v) {
@@ -233,6 +234,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           const SizedBox(height: 10),
 
           AuthTextField(
+            key: const ValueKey('password'),
             label: 'Password', hint: isSignUp ? 'Min. 8 characters' : 'Your password',
             controller: _passwordController, obscureText: true,
             textInputAction: isSignUp ? TextInputAction.next : TextInputAction.done,
@@ -246,7 +248,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
           if (isSignUp) ...[
             const SizedBox(height: 10),
-            AuthTextField(label: 'Confirm password', hint: 'Repeat your password',
+            AuthTextField(key: const ValueKey('confirm-password'), label: 'Confirm password', hint: 'Repeat your password',
               controller: _confirmPasswordController, obscureText: true,
               textInputAction: TextInputAction.done,
               autofillHints: const [AutofillHints.newPassword],
