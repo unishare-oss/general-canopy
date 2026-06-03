@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:canopy/features/auth/data/datasources/firestore_user_datasource.dart';
 import 'package:canopy/features/auth/data/models/app_user_model.dart';
+import 'package:canopy/features/auth/domain/entities/check_in_frequency.dart';
+import 'package:canopy/features/auth/domain/entities/notification_preferences.dart';
+import 'package:canopy/features/auth/domain/entities/plant_experience.dart';
 
 // ---------------------------------------------------------------------------
 // Minimal FirebaseFirestore stub — never touches the SDK
@@ -17,8 +20,15 @@ class FakeFirestoreUserDatasource extends FirestoreUserDatasource {
   FakeFirestoreUserDatasource() : super(firestore: _StubFirestore());
 
   final Map<String, AppUserModel> storedUsers = {};
-  final Set<String> consentWrittenForUids = {};
   int createUserCallCount = 0;
+  int updateUserProfileCallCount = 0;
+
+  // Captures from the last updateUserProfile call
+  String? lastUpdateUid;
+  String? lastUpdateNeighborhood;
+  CheckInFrequency? lastUpdateFrequency;
+  PlantExperience? lastUpdateExperience;
+  bool? lastUpdateOnboardingComplete;
 
   @override
   Future<AppUserModel?> getUser(String uid) async => storedUsers[uid];
@@ -29,8 +39,6 @@ class FakeFirestoreUserDatasource extends FirestoreUserDatasource {
     required String name,
     required String email,
     String? photoUrl,
-    String? universityId,
-    bool withConsent = false,
   }) async {
     createUserCallCount++;
     storedUsers[uid] = AppUserModel(
@@ -38,30 +46,34 @@ class FakeFirestoreUserDatasource extends FirestoreUserDatasource {
       name: name,
       email: email,
       photoUrl: photoUrl,
-      universityId: universityId,
     );
-    if (withConsent) consentWrittenForUids.add(uid);
   }
 
   @override
-  Future<void> updateAcademicProfile({
+  Future<void> updateUserProfile({
     required String uid,
-    required String departmentId,
-    int? enrollmentYear,
+    String? name,
+    String? neighborhood,
+    CheckInFrequency? checkInFrequency,
+    PlantExperience? plantExperience,
+    NotificationPreferences? notificationPreferences,
+    bool? onboardingComplete,
   }) async {
+    updateUserProfileCallCount++;
+    lastUpdateUid = uid;
+    lastUpdateNeighborhood = neighborhood;
+    lastUpdateFrequency = checkInFrequency;
+    lastUpdateExperience = plantExperience;
+    lastUpdateOnboardingComplete = onboardingComplete;
+
     final existing = storedUsers[uid];
     if (existing != null) {
       storedUsers[uid] = existing.copyWith(
-        departmentId: departmentId,
-        enrollmentYear: enrollmentYear,
+        neighborhood: neighborhood ?? existing.neighborhood,
+        checkInFrequency: checkInFrequency?.name ?? existing.checkInFrequency,
+        plantExperience: plantExperience?.name ?? existing.plantExperience,
+        onboardingComplete: onboardingComplete ?? existing.onboardingComplete,
       );
     }
   }
-
-  @override
-  Stream<List<({String id, String name})>> getUniversities() =>
-      Stream.value([]);
-
-  @override
-  Stream<List<({String id, String name})>> getDepartments() => Stream.value([]);
 }

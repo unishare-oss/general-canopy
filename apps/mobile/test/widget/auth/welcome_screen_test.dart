@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:canopy/features/auth/domain/entities/app_user.dart';
+import 'package:canopy/features/auth/domain/entities/check_in_frequency.dart';
+import 'package:canopy/features/auth/domain/entities/notification_preferences.dart';
+import 'package:canopy/features/auth/domain/entities/plant_experience.dart';
 import 'package:canopy/features/auth/domain/repositories/auth_repository.dart';
 import 'package:canopy/features/auth/presentation/providers/auth_repository_provider.dart';
-import 'package:canopy/features/auth/presentation/providers/universities_provider.dart';
 import 'package:canopy/features/auth/presentation/screens/welcome_screen.dart';
 import 'package:canopy/shared/theme/app_theme.dart';
 import 'package:canopy/shared/theme/themes.dart';
@@ -45,7 +47,6 @@ class _FakeAuthRepository implements AuthRepository {
     required String name,
     required String email,
     required String password,
-    String? universityId,
   }) async => throw UnimplementedError();
 
   @override
@@ -55,21 +56,21 @@ class _FakeAuthRepository implements AuthRepository {
   Future<AppUser?> getCurrentUser() async => null;
 
   @override
-  Future<void> updateProfile({
+  Future<void> updateUserProfile({
     required String uid,
-    required String name,
-    String? bio,
-    String? universityId,
-    String? departmentId,
-    int? enrollmentYear,
+    String? name,
+    String? neighborhood,
+    CheckInFrequency? checkInFrequency,
+    PlantExperience? plantExperience,
+    NotificationPreferences? notificationPreferences,
+    bool? onboardingComplete,
   }) => throw UnimplementedError();
 
   @override
-  Future<void> updateAcademicProfile({
+  Future<AppUser> linkAnonymousAccount({
     required String uid,
-    required String departmentId,
-    int? enrollmentYear,
-  }) async {}
+    required Object credential,
+  }) => throw UnimplementedError();
 }
 
 // ---------------------------------------------------------------------------
@@ -80,9 +81,6 @@ Widget _buildSubject() {
   return ProviderScope(
     overrides: [
       authRepositoryProvider.overrideWithValue(_FakeAuthRepository()),
-      universitiesProvider.overrideWith(
-        (ref) => Stream.value(<({String id, String name})>[]),
-      ),
     ],
     child: MaterialApp(
       theme: AppTheme.build(AppThemes.canopy),
@@ -110,19 +108,54 @@ Finder get _signInLink => find.descendant(
 void main() {
   group('AuthScreen — sign-in mode', () {
     testWidgets(
-      'renders Google button, Microsoft button, email/password fields, '
-      'mode-switch link and guest link',
+      'renders Google button, email/password fields, mode-switch link and guest link',
       (tester) async {
         await tester.pumpWidget(_buildSubject());
         await tester.pump();
 
         expect(find.text('Continue with Google'), findsOneWidget);
-        expect(find.text('Continue with Microsoft'), findsOneWidget);
+        // Microsoft button must NOT be present
+        expect(find.text('Continue with Microsoft'), findsNothing);
         expect(find.byType(TextFormField), findsNWidgets(2));
         expect(_signUpLink, findsOneWidget);
         expect(find.text('Continue as guest'), findsOneWidget);
       },
     );
+
+    testWidgets('university dropdown is absent from sign-in mode', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_buildSubject());
+      await tester.pump();
+
+      // No DropdownButtonFormField in sign-in mode
+      expect(find.byType(DropdownButtonFormField<String>), findsNothing);
+    });
+
+    testWidgets('email hint text does not mention university', (tester) async {
+      await tester.pumpWidget(_buildSubject());
+      await tester.pump();
+
+      // The old hint was 'you@university.edu' — it must be gone
+      expect(find.text('you@university.edu'), findsNothing);
+      // New hint text
+      expect(find.text('you@example.com'), findsOneWidget);
+    });
+
+    testWidgets('subheading is Canopy-specific copy', (tester) async {
+      await tester.pumpWidget(_buildSubject());
+      await tester.pump();
+
+      expect(
+        find.text('Adopt a tree. Keep it alive. Cool your city.'),
+        findsOneWidget,
+      );
+      // Old Unishare copy must be gone
+      expect(
+        find.text('Use your university account to continue'),
+        findsNothing,
+      );
+    });
 
     testWidgets('tapping "Continue as guest" calls signInAnonymously', (
       tester,
@@ -131,12 +164,7 @@ void main() {
 
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [
-            authRepositoryProvider.overrideWithValue(fakeRepo),
-            universitiesProvider.overrideWith(
-              (ref) => Stream.value(<({String id, String name})>[]),
-            ),
-          ],
+          overrides: [authRepositoryProvider.overrideWithValue(fakeRepo)],
           child: MaterialApp(
             theme: AppTheme.build(AppThemes.canopy),
             home: const AuthScreen(),
@@ -161,7 +189,7 @@ void main() {
     }
 
     testWidgets(
-      'switching to sign-up shows name, email, password, confirm, consent',
+      'switching to sign-up shows name, email, password, confirm, consent — no university dropdown',
       (tester) async {
         await tester.pumpWidget(_buildSubject());
         await tester.pump();
@@ -171,23 +199,17 @@ void main() {
         // Heading changed
         expect(find.text('Create account'), findsWidgets);
 
-        // 4 TextFormFields: name, email, password, confirm password
-        // (university dropdown is a DropdownButtonFormField, not TextFormField)
+        // Exactly 4 TextFormFields: name, email, password, confirm password
         expect(find.byType(TextFormField), findsNWidgets(4));
+
+        // No university dropdown
+        expect(find.byType(DropdownButtonFormField<String>), findsNothing);
 
         // Consent checkbox
         expect(find.byType(Checkbox), findsOneWidget);
 
         // Mode-switch now shows sign-in link
         expect(_signInLink, findsOneWidget);
-
-        // OAuth footnote visible
-        expect(
-          find.text(
-            'By continuing with Google or Microsoft you agree to our Terms and Privacy Policy.',
-          ),
-          findsOneWidget,
-        );
       },
     );
 
@@ -220,7 +242,7 @@ void main() {
       expect(find.text('Passwords do not match'), findsOneWidget);
     });
 
-    testWidgets('submit without consent shows consent error', (tester) async {
+    testWidgets('submit without consent disables button', (tester) async {
       await tester.pumpWidget(_buildSubject());
       await tester.pump();
 

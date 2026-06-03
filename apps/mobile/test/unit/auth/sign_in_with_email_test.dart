@@ -1,6 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:canopy/features/auth/domain/entities/app_user.dart';
+import 'package:canopy/features/auth/domain/entities/check_in_frequency.dart';
+import 'package:canopy/features/auth/domain/entities/notification_preferences.dart';
+import 'package:canopy/features/auth/domain/entities/plant_experience.dart';
 import 'package:canopy/features/auth/domain/repositories/auth_repository.dart';
 import 'package:canopy/features/auth/domain/usecases/sign_in_with_email.dart';
 
@@ -32,7 +35,6 @@ class _FakeAuthRepository implements AuthRepository {
     required String name,
     required String email,
     required String password,
-    String? universityId,
   }) => throw UnimplementedError();
 
   @override
@@ -42,21 +44,21 @@ class _FakeAuthRepository implements AuthRepository {
   Future<AppUser?> getCurrentUser() async => null;
 
   @override
-  Future<void> updateProfile({
+  Future<void> updateUserProfile({
     required String uid,
-    required String name,
-    String? bio,
-    String? universityId,
-    String? departmentId,
-    int? enrollmentYear,
+    String? name,
+    String? neighborhood,
+    CheckInFrequency? checkInFrequency,
+    PlantExperience? plantExperience,
+    NotificationPreferences? notificationPreferences,
+    bool? onboardingComplete,
   }) => throw UnimplementedError();
 
   @override
-  Future<void> updateAcademicProfile({
+  Future<AppUser> linkAnonymousAccount({
     required String uid,
-    required String departmentId,
-    int? enrollmentYear,
-  }) async {}
+    required Object credential,
+  }) => throw UnimplementedError();
 }
 
 void main() {

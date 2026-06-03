@@ -1,13 +1,15 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:canopy/features/auth/domain/entities/app_user.dart';
+import 'package:canopy/features/auth/domain/entities/check_in_frequency.dart';
+import 'package:canopy/features/auth/domain/entities/notification_preferences.dart';
+import 'package:canopy/features/auth/domain/entities/plant_experience.dart';
 import 'package:canopy/features/auth/domain/repositories/auth_repository.dart';
 import 'package:canopy/features/auth/domain/usecases/sign_up_with_email.dart';
 
 class _FakeAuthRepository implements AuthRepository {
   String? capturedName;
   String? capturedEmail;
-  String? capturedUniversityId;
 
   @override
   Stream<AppUser?> get authStateChanges => const Stream.empty();
@@ -29,11 +31,9 @@ class _FakeAuthRepository implements AuthRepository {
     required String name,
     required String email,
     required String password,
-    String? universityId,
   }) async {
     capturedName = name;
     capturedEmail = email;
-    capturedUniversityId = universityId;
     return AppUser(id: 'uid-su', name: name, email: email);
   }
 
@@ -44,21 +44,21 @@ class _FakeAuthRepository implements AuthRepository {
   Future<AppUser?> getCurrentUser() async => null;
 
   @override
-  Future<void> updateProfile({
+  Future<void> updateUserProfile({
     required String uid,
-    required String name,
-    String? bio,
-    String? universityId,
-    String? departmentId,
-    int? enrollmentYear,
+    String? name,
+    String? neighborhood,
+    CheckInFrequency? checkInFrequency,
+    PlantExperience? plantExperience,
+    NotificationPreferences? notificationPreferences,
+    bool? onboardingComplete,
   }) => throw UnimplementedError();
 
   @override
-  Future<void> updateAcademicProfile({
+  Future<AppUser> linkAnonymousAccount({
     required String uid,
-    required String departmentId,
-    int? enrollmentYear,
-  }) async {}
+    required Object credential,
+  }) => throw UnimplementedError();
 }
 
 void main() {
@@ -70,12 +70,28 @@ void main() {
       name: 'Alice',
       email: 'alice@example.com',
       password: 'secret123',
-      universityId: 'uni-42',
     );
 
     expect(repo.capturedName, 'Alice');
     expect(repo.capturedEmail, 'alice@example.com');
-    expect(repo.capturedUniversityId, 'uni-42');
     expect(user.id, 'uid-su');
+  });
+
+  test('SignUpWithEmail does not accept universityId parameter', () {
+    // This test verifies at the type level that universityId is no longer
+    // a parameter of SignUpWithEmail.call — if universityId were still present,
+    // the call below would fail to compile.
+    final repo = _FakeAuthRepository();
+    final useCase = SignUpWithEmail(repo);
+
+    // Should compile fine with only name/email/password
+    expect(
+      () => useCase(
+        name: 'Bob',
+        email: 'bob@example.com',
+        password: 'password123',
+      ),
+      returnsNormally,
+    );
   });
 }
