@@ -7,6 +7,7 @@ import 'package:canopy/features/auth/presentation/providers/auth_state_provider.
 import 'package:canopy/features/auth/presentation/providers/guest_mode_provider.dart';
 import 'package:canopy/features/discover/presentation/widgets/sapling_card_stack.dart';
 import 'package:canopy/features/discover/presentation/widgets/adopt_confirmation_sheet.dart';
+import 'package:canopy/features/discover/presentation/widgets/adopt_confirm_sheet.dart';
 import 'package:canopy/features/map/presentation/screens/map_screen.dart';
 
 enum DiscoverView { cards, map }
@@ -91,9 +92,18 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                       context.push('/welcome?redirect=/sapling/${sapling.id}');
                       return;
                     }
+                    if (!context.mounted) return;
+                    final confirmed =
+                        await AdoptConfirmSheet.show(context, sapling);
+                    if (!confirmed || !context.mounted) return;
                     await ref
                         .read(discoverQueueProvider.notifier)
-                        .adopt(saplingId: sapling.id, uid: user.id);
+                        .adopt(
+                          saplingId: sapling.id,
+                          uid: user.id,
+                          displayName: user.name,
+                          photoUrl: user.photoUrl,
+                        );
                     if (context.mounted &&
                         ref.read(discoverQueueProvider).adoptError == null) {
                       await AdoptConfirmationSheet.show(context, sapling);

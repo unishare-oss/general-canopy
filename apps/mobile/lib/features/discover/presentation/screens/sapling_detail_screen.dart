@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:canopy/features/saplings/domain/entities/sapling.dart';
+import 'package:canopy/features/saplings/domain/entities/sapling_exceptions.dart';
 import 'package:canopy/features/saplings/domain/usecases/get_sapling_by_id.dart';
+import 'package:canopy/features/saplings/domain/usecases/unadopt_sapling.dart';
 import 'package:canopy/features/saplings/presentation/providers/sapling_repository_provider.dart';
 import 'package:canopy/features/saplings/presentation/providers/discover_queue_provider.dart';
 import 'package:canopy/features/auth/presentation/providers/auth_state_provider.dart';
 import 'package:canopy/features/auth/presentation/providers/guest_mode_provider.dart';
+import 'package:canopy/features/discover/presentation/widgets/adopt_confirm_sheet.dart';
 import 'package:canopy/features/discover/presentation/widgets/adopt_confirmation_sheet.dart';
 
 // Provider for loading a sapling by ID (family provider — no codegen needed).
@@ -34,13 +37,70 @@ class SaplingDetailScreen extends ConsumerWidget {
   }
 }
 
-class _SaplingDetailBody extends ConsumerWidget {
+class _SaplingDetailBody extends ConsumerStatefulWidget {
   const _SaplingDetailBody({required this.sapling});
 
   final Sapling sapling;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_SaplingDetailBody> createState() => _SaplingDetailBodyState();
+}
+
+class _SaplingDetailBodyState extends ConsumerState<_SaplingDetailBody> {
+  bool _isUnadopting = false;
+
+  Future<void> _handleUnadopt(String uid) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Release this tree?'),
+        content: Text(
+          '${widget.sapling.nickname} will be available for someone else to adopt.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Release'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    setState(() => _isUnadopting = true);
+    try {
+      await UnadoptSapling(ref.read(saplingRepositoryProvider))(
+        saplingId: widget.sapling.id,
+        uid: uid,
+      );
+      if (mounted) context.pop();
+    } on SaplingNotAdoptedByUserException {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not release — you may not be the adopter.')),
+        );
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Release failed. Please try again.')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isUnadopting = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final sapling = widget.sapling;
     final tt = Theme.of(context).textTheme;
     final cs = Theme.of(context).colorScheme;
     final accentColor = Color(
@@ -53,6 +113,9 @@ class _SaplingDetailBody extends ConsumerWidget {
     final isAuthenticated =
         authAsync.value != null && !authAsync.value!.isAnonymous && !isGuest;
     final isAvailable = sapling.isAvailable;
+    final currentUid = authAsync.value?.id;
+    final isOwner =
+        currentUid != null && sapling.adoptedBy == currentUid;
 
     return SingleChildScrollView(
       child: Column(
@@ -143,10 +206,20 @@ class _SaplingDetailBody extends ConsumerWidget {
                                 );
                                 return;
                               }
-                              final uid = authAsync.value!.id;
+                              final confirmed = await AdoptConfirmSheet.show(
+                                context,
+                                sapling,
+                              );
+                              if (!confirmed || !context.mounted) return;
+                              final user = authAsync.value!;
                               await ref
                                   .read(discoverQueueProvider.notifier)
-                                  .adopt(saplingId: sapling.id, uid: uid);
+                                  .adopt(
+                                    saplingId: sapling.id,
+                                    uid: user.id,
+                                    displayName: user.name,
+                                    photoUrl: user.photoUrl,
+                                  );
                               if (context.mounted &&
                                   ref.read(discoverQueueProvider).adoptError ==
                                       null) {
@@ -154,18 +227,50 @@ class _SaplingDetailBody extends ConsumerWidget {
                                   context,
                                   sapling,
                                 );
-                                // Pop back to the caller (e.g. DiscoverScreen)
-                                // with true so it can switch to the map view.
                                 if (context.mounted) context.pop(true);
                               }
                             },
                     ),
                   )
-                else
+                else ...[
                   Chip(
-                    avatar: const Icon(Icons.check_circle_outline, size: 16),
-                    label: Text('Already adopted', style: tt.labelMedium),
+                    avatar: Icon(
+                      isOwner ? Icons.favorite : Icons.check_circle_outline,
+                      size: 16,
+                    ),
+                    label: Text(
+                      isOwner
+                          ? 'Already adopted by you'
+                          : sapling.adoptedByName != null
+                              ? 'Adopted by ${sapling.adoptedByName}'
+                              : 'Already adopted',
+                      style: tt.labelMedium,
+                    ),
                   ),
+                  if (isOwner) ...[
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        icon: _isUnadopting
+                            ? const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : const Icon(Icons.undo),
+                        label: const Text('Release this tree'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: cs.error,
+                          side: BorderSide(color: cs.error),
+                        ),
+                        onPressed: _isUnadopting
+                            ? null
+                            : () => _handleUnadopt(currentUid!),
+                      ),
+                    ),
+                  ],
+                ],
               ],
             ),
           ),
