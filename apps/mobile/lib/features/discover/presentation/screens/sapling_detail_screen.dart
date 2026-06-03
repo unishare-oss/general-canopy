@@ -84,7 +84,9 @@ class _SaplingDetailBodyState extends ConsumerState<_SaplingDetailBody> {
     } on SaplingNotAdoptedByUserException {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not release — you may not be the adopter.')),
+          const SnackBar(
+            content: Text('Could not release — you may not be the adopter.'),
+          ),
         );
       }
     } catch (_) {
@@ -114,8 +116,7 @@ class _SaplingDetailBodyState extends ConsumerState<_SaplingDetailBody> {
         authAsync.value != null && !authAsync.value!.isAnonymous && !isGuest;
     final isAvailable = sapling.isAvailable;
     final currentUid = authAsync.value?.id;
-    final isOwner =
-        currentUid != null && sapling.adoptedBy == currentUid;
+    final isOwner = currentUid != null && sapling.adoptedBy == currentUid;
 
     return SingleChildScrollView(
       child: Column(
@@ -137,7 +138,7 @@ class _SaplingDetailBodyState extends ConsumerState<_SaplingDetailBody> {
                                 color: cs.onPrimary,
                                 value: progress.expectedTotalBytes != null
                                     ? progress.cumulativeBytesLoaded /
-                                        progress.expectedTotalBytes!
+                                          progress.expectedTotalBytes!
                                     : null,
                               ),
                             ),
@@ -242,8 +243,8 @@ class _SaplingDetailBodyState extends ConsumerState<_SaplingDetailBody> {
                       isOwner
                           ? 'Already adopted by you'
                           : sapling.adoptedByName != null
-                              ? 'Adopted by ${sapling.adoptedByName}'
-                              : 'Already adopted',
+                          ? 'Adopted by ${sapling.adoptedByName}'
+                          : 'Already adopted',
                       style: tt.labelMedium,
                     ),
                   ),
@@ -256,7 +257,9 @@ class _SaplingDetailBodyState extends ConsumerState<_SaplingDetailBody> {
                             ? const SizedBox(
                                 width: 16,
                                 height: 16,
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
                               )
                             : const Icon(Icons.undo),
                         label: const Text('Release this tree'),

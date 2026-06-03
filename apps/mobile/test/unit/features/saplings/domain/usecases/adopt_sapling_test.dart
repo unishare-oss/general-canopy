@@ -101,4 +101,3 @@ class _ThrowingRepo implements SaplingRepository {
     required String uid,
   }) => throw UnimplementedError();
 }
-

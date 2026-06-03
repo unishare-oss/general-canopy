@@ -69,11 +69,7 @@ class _SaplingMap extends StatelessWidget {
             MarkerLayer(markers: markers),
           ],
         ),
-        Positioned(
-          top: 12,
-          right: 12,
-          child: _LegendButton(),
-        ),
+        Positioned(top: 12, right: 12, child: _LegendButton()),
       ],
     );
   }
@@ -92,7 +88,11 @@ class _LegendButton extends StatelessWidget {
           color: cs.surface,
           shape: BoxShape.circle,
           boxShadow: const [
-            BoxShadow(color: Colors.black26, blurRadius: 6, offset: Offset(0, 2)),
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 6,
+              offset: Offset(0, 2),
+            ),
           ],
         ),
         child: Icon(Icons.info_outline, size: 20, color: cs.onSurface),
@@ -274,8 +274,9 @@ class _AdopterAvatar extends StatelessWidget {
         fit: BoxFit.cover,
         errorBuilder: (_, __, ___) =>
             const Icon(Icons.person, size: 20, color: Colors.white),
-        loadingBuilder: (_, child, progress) =>
-            progress == null ? child : const Icon(Icons.person, size: 20, color: Colors.white),
+        loadingBuilder: (_, child, progress) => progress == null
+            ? child
+            : const Icon(Icons.person, size: 20, color: Colors.white),
       ),
     );
   }

@@ -73,7 +73,6 @@ class _FakeSaplingRepository implements SaplingRepository {
   }) => throw UnimplementedError();
 }
 
-
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------

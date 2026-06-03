@@ -40,12 +40,16 @@ class SaplingCard extends StatelessWidget {
                                   color: cs.onPrimary,
                                   value: progress.expectedTotalBytes != null
                                       ? progress.cumulativeBytesLoaded /
-                                          progress.expectedTotalBytes!
+                                            progress.expectedTotalBytes!
                                       : null,
                                 ),
                               ),
                         errorBuilder: (_, __, ___) => Center(
-                          child: Icon(Icons.park, size: 80, color: cs.onPrimary),
+                          child: Icon(
+                            Icons.park,
+                            size: 80,
+                            color: cs.onPrimary,
+                          ),
                         ),
                       )
                     : Center(

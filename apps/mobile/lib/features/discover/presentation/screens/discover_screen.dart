@@ -78,8 +78,9 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                   saplings: queueState.queue,
                   isDisabled: queueState.isAdopting,
                   onTap: (sapling) async {
-                    final adopted =
-                        await context.push<bool>('/sapling/${sapling.id}');
+                    final adopted = await context.push<bool>(
+                      '/sapling/${sapling.id}',
+                    );
                     if (adopted == true && mounted) {
                       setState(() => _view = DiscoverView.map);
                     }
@@ -93,8 +94,10 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                       return;
                     }
                     if (!context.mounted) return;
-                    final confirmed =
-                        await AdoptConfirmSheet.show(context, sapling);
+                    final confirmed = await AdoptConfirmSheet.show(
+                      context,
+                      sapling,
+                    );
                     if (!confirmed || !context.mounted) return;
                     await ref
                         .read(discoverQueueProvider.notifier)

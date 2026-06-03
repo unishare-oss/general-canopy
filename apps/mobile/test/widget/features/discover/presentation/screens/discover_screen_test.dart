@@ -51,7 +51,6 @@ class _NoopSaplingRepository implements SaplingRepository {
   }) => throw UnimplementedError();
 }
 
-
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------

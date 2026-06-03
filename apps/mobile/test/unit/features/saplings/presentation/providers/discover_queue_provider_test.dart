@@ -44,7 +44,6 @@ class _FakeSaplingRepository implements SaplingRepository {
   }) => throw UnimplementedError();
 }
 
-
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -140,7 +139,11 @@ void main() {
 
       await container
           .read(discoverQueueProvider.notifier)
-          .adopt(saplingId: 'tree-1', uid: 'user-uid', displayName: 'Test User');
+          .adopt(
+            saplingId: 'tree-1',
+            uid: 'user-uid',
+            displayName: 'Test User',
+          );
 
       final state = container.read(discoverQueueProvider);
       expect(state.isAdopting, isFalse);
@@ -156,7 +159,11 @@ void main() {
 
       await container
           .read(discoverQueueProvider.notifier)
-          .adopt(saplingId: 'tree-3', uid: 'user-uid', displayName: 'Test User');
+          .adopt(
+            saplingId: 'tree-3',
+            uid: 'user-uid',
+            displayName: 'Test User',
+          );
 
       final state = container.read(discoverQueueProvider);
       expect(state.isAdopting, isFalse);
@@ -171,7 +178,11 @@ void main() {
 
       await container
           .read(discoverQueueProvider.notifier)
-          .adopt(saplingId: 'tree-4', uid: 'user-uid', displayName: 'Test User');
+          .adopt(
+            saplingId: 'tree-4',
+            uid: 'user-uid',
+            displayName: 'Test User',
+          );
 
       final state = container.read(discoverQueueProvider);
       expect(state.adoptError, isNotNull);
