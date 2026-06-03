@@ -113,3 +113,30 @@ Summary:  20 files changed, 406 insertions(+), 783 deletions(-)
   [11:43] Write: apps/mobile/lib/features/auth/presentation/screens/welcome_screen.dart
   [11:43] Edit: apps/mobile/lib/features/auth/presentation/screens/onboarding_screen.dart
   [11:43] Edit: apps/mobile/lib/features/auth/presentation/screens/onboarding_screen.dart
+  [11:50] Edit: apps/mobile/lib/features/auth/presentation/screens/welcome_screen.dart
+  [11:50] Edit: apps/mobile/lib/features/auth/presentation/screens/welcome_screen.dart
+  [11:50] Edit: apps/mobile/lib/features/auth/presentation/screens/welcome_screen.dart
+  [11:50] Edit: apps/mobile/lib/features/auth/presentation/screens/welcome_screen.dart
+Files:
+  ~ apps/mobile/lib/features/auth/presentation/screens/welcome_screen.dart
+Summary:  1 file changed, 4 insertions(+), 3 deletions(-)
+
+Files:
+  ~ apps/mobile/lib/features/auth/presentation/screens/welcome_screen.dart
+Summary:  1 file changed, 4 insertions(+), 3 deletions(-)
+
+Files:
+  ~ apps/mobile/lib/features/auth/presentation/screens/welcome_screen.dart
+Summary:  1 file changed, 4 insertions(+), 3 deletions(-)
+
+Files:
+  ~ apps/mobile/lib/features/auth/presentation/screens/welcome_screen.dart
+Summary:  1 file changed, 4 insertions(+), 3 deletions(-)
+
+  [11:57] Edit: apps/mobile/lib/features/auth/data/datasources/firebase_auth_datasource.dart
+Files:
+  ~ apps/mobile/lib/features/auth/data/datasources/firebase_auth_datasource.dart
+  ~ apps/mobile/lib/features/auth/presentation/screens/welcome_screen.dart
+Summary:  2 files changed, 5 insertions(+), 4 deletions(-)
+
+  [12:10] Edit: apps/mobile/lib/features/auth/presentation/screens/welcome_screen.dart
