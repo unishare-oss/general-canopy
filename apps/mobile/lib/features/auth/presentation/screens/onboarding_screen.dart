@@ -109,7 +109,10 @@ class _OnboardingTopBar extends StatelessWidget {
                 width: 40,
                 child: onBack != null
                     ? IconButton(
-                        icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
+                        icon: const Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          size: 18,
+                        ),
                         onPressed: onBack,
                         color: cs.onSurface,
                         padding: EdgeInsets.zero,
@@ -120,8 +123,16 @@ class _OnboardingTopBar extends StatelessWidget {
               if (onSkip != null)
                 TextButton(
                   onPressed: onSkip,
-                  style: TextButton.styleFrom(foregroundColor: ac.mutedForeground, padding: EdgeInsets.zero),
-                  child: Text('Skip', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: ac.mutedForeground)),
+                  style: TextButton.styleFrom(
+                    foregroundColor: ac.mutedForeground,
+                    padding: EdgeInsets.zero,
+                  ),
+                  child: Text(
+                    'Skip',
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodySmall?.copyWith(color: ac.mutedForeground),
+                  ),
                 ),
             ],
           ),
@@ -276,7 +287,11 @@ class _StepWelcome extends StatelessWidget {
               children: [
                 Positioned(
                   bottom: 16,
-                  child: Icon(Icons.park_rounded, size: 120, color: cs.primary.withValues(alpha: 0.15)),
+                  child: Icon(
+                    Icons.park_rounded,
+                    size: 120,
+                    color: cs.primary.withValues(alpha: 0.15),
+                  ),
                 ),
                 Icon(Icons.park_rounded, size: 88, color: cs.primary),
               ],
@@ -311,14 +326,26 @@ class _StepWelcome extends StatelessWidget {
               minimumSize: const Size.fromHeight(48),
               backgroundColor: cs.primary,
               foregroundColor: cs.onPrimary,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Get started', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600, color: cs.onPrimary)),
+                Text(
+                  'Get started',
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: cs.onPrimary,
+                  ),
+                ),
                 const SizedBox(width: 8),
-                Icon(Icons.arrow_forward_rounded, size: 18, color: cs.onPrimary),
+                Icon(
+                  Icons.arrow_forward_rounded,
+                  size: 18,
+                  color: cs.onPrimary,
+                ),
               ],
             ),
           ),

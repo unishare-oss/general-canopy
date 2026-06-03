@@ -97,10 +97,12 @@ class FirebaseAuthDatasource {
         const AuthException(AuthFailureType.invalidCredentials),
       'email-already-in-use' || 'credential-already-in-use' =>
         const AuthException(AuthFailureType.emailAlreadyInUse),
-      'network-request-failed' =>
-        const AuthException(AuthFailureType.networkError),
-      'operation-not-allowed' =>
-        const AuthException(AuthFailureType.providerDisabled),
+      'network-request-failed' => const AuthException(
+        AuthFailureType.networkError,
+      ),
+      'operation-not-allowed' => const AuthException(
+        AuthFailureType.providerDisabled,
+      ),
       _ => const AuthException(AuthFailureType.unknown),
     };
   }
