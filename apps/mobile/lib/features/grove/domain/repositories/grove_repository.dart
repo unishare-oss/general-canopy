@@ -19,4 +19,12 @@ abstract interface class GroveRepository {
     required String uid,
     required String adoptionId,
   });
+
+  Future<void> logCareEvent({
+    required String uid,
+    required String adoptionId,
+    required String saplingId,
+    required CareEventType type,
+    double waterLiters = 2.0,
+  });
 }

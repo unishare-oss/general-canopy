@@ -44,4 +44,19 @@ class GroveRepositoryImpl implements GroveRepository {
     );
     return list.map((r) => r.$2.toEntity(r.$1)).toList();
   }
+
+  @override
+  Future<void> logCareEvent({
+    required String uid,
+    required String adoptionId,
+    required String saplingId,
+    required CareEventType type,
+    double waterLiters = 2.0,
+  }) => _datasource.logCareEvent(
+    uid: uid,
+    adoptionId: adoptionId,
+    saplingId: saplingId,
+    type: type,
+    waterLiters: waterLiters,
+  );
 }
