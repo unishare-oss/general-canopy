@@ -52,6 +52,13 @@ dependencies:
   freezed_annotation: ^3.1.0
   json_annotation: ^4.11.0
 
+  # Discover swipe deck
+  flutter_card_swiper: ^7.0.1
+
+  # Map
+  flutter_map: ^7.0.0
+  latlong2: ^0.9.1
+
   # UI
   google_fonts: ^8.1.0
   flutter_svg: ^2.3.0
