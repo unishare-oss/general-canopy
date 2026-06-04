@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:canopy/features/auth/presentation/providers/auth_state_provider.dart';
 import 'package:canopy/features/auth/presentation/providers/onboarding_provider.dart';
@@ -25,6 +26,18 @@ class OnboardingScreen extends ConsumerWidget {
     final notifier = ref.read(onboardingProvider.notifier);
     final authAsync = ref.watch(authStateProvider);
     final uid = authAsync.asData?.value?.id;
+
+    // authStateChanges only re-emits on Firebase Auth events, so writing
+    // onboardingComplete to Firestore never triggers the router redirect.
+    // Navigate directly once submit succeeds.
+    ref.listen<OnboardingState>(onboardingProvider, (previous, next) {
+      if (previous?.isSubmitting == true &&
+          !next.isSubmitting &&
+          next.submitError == null &&
+          context.mounted) {
+        context.go('/grove');
+      }
+    });
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
