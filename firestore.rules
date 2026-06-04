@@ -74,6 +74,48 @@ service cloud.firestore {
       }
     }
 
+    // ── Admins ────────────────────────────────────────────────────────────────
+    match /admins/{userId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isAdmin == true
+        && request.resource.data.isAdmin == true;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    // ── Discoveries ───────────────────────────────────────────────────────────
+    match /discoveries/{discoveryId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isAdmin == true
+        && request.resource.data.createdBy == request.auth.uid;
+      allow update: if request.auth != null
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isAdmin == true;
+      allow delete: if request.auth != null
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isAdmin == true;
+    }
+
+    // ── Impact sub-collections ────────────────────────────────────────────
+    match /users/{userId}/impactSummary/{doc} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    match /users/{userId}/saplingAdoptions/{saplingId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    match /users/{userId}/achievements/{achievementId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    match /users/{userId}/activityFeed/{activityId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // ── Neighborhood leaderboard ──────────────────────────────────────────
+    match /neighborhoodLeaderboard/{neighborhood}/entries/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
     // ── Default deny ──────────────────────────────────────────────────────
     // Every other collection is locked down until you add an explicit rule.
     // Add new `match` blocks above this line as you build features.
