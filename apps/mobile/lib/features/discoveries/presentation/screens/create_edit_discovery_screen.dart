@@ -111,9 +111,9 @@ class _CreateEditDiscoveryScreenState
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     } finally {
       if (mounted) setState(() => _submitting = false);
@@ -234,10 +234,7 @@ class _CreateEditDiscoveryScreenState
                   maxLength: 6,
                 ),
                 const SizedBox(height: 16),
-                _SectionLabel(
-                  label: 'Photo URL (optional)',
-                  textTheme: tt,
-                ),
+                _SectionLabel(label: 'Photo URL (optional)', textTheme: tt),
                 const SizedBox(height: 6),
                 TextFormField(
                   controller: _photoUrlCtrl,
@@ -249,9 +246,7 @@ class _CreateEditDiscoveryScreenState
                 const SizedBox(height: 24),
                 FilledButton(
                   onPressed: _submitting ? null : _submit,
-                  child: Text(
-                    _isEditing ? 'Save changes' : 'Create discovery',
-                  ),
+                  child: Text(_isEditing ? 'Save changes' : 'Create discovery'),
                 ),
                 const SizedBox(height: 24),
               ],
@@ -260,8 +255,7 @@ class _CreateEditDiscoveryScreenState
         ),
         if (_submitting)
           const ModalBarrier(dismissible: false, color: Colors.black26),
-        if (_submitting)
-          const Center(child: CircularProgressIndicator()),
+        if (_submitting) const Center(child: CircularProgressIndicator()),
       ],
     );
   }

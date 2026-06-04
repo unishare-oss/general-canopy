@@ -134,15 +134,13 @@ GoRouter router(Ref ref) {
       ),
       GoRoute(
         path: '/discovery/:id/edit',
-        builder: (c, s) => CreateEditDiscoveryScreen(
-          discovery: s.extra as Discovery?,
-        ),
+        builder: (c, s) =>
+            CreateEditDiscoveryScreen(discovery: s.extra as Discovery?),
       ),
       GoRoute(
         path: '/discovery/:id',
-        builder: (c, s) => DiscoveryDetailScreen(
-          discoveryId: s.pathParameters['id']!,
-        ),
+        builder: (c, s) =>
+            DiscoveryDetailScreen(discoveryId: s.pathParameters['id']!),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>

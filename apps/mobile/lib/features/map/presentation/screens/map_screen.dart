@@ -67,9 +67,7 @@ class _SaplingMap extends ConsumerWidget {
     }).toList();
 
     final discoveryMarkers = discoveries.map((d) {
-      final color = Color(
-        int.parse('0xFF${d.colorHex.replaceFirst('#', '')}'),
-      );
+      final color = Color(int.parse('0xFF${d.colorHex.replaceFirst('#', '')}'));
       return Marker(
         point: LatLng(d.lat, d.lng),
         width: 40,

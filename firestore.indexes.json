@@ -1,33 +1,4 @@
 {
-  "indexes": [
-    {
-      "collectionGroup": "adoptions",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "nextActionAt", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "photos",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "takenAt", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "history",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "performedAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "discoveries",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    }
-  ],
+  "indexes": [],
   "fieldOverrides": []
 }

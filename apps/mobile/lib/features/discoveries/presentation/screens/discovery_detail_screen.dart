@@ -44,10 +44,8 @@ class DiscoveryDetailScreen extends ConsumerWidget {
         return _DiscoveryDetailView(
           discovery: discovery,
           isAdmin: isAdmin,
-          onEdit: () => context.push(
-            '/discovery/$discoveryId/edit',
-            extra: discovery,
-          ),
+          onEdit: () =>
+              context.push('/discovery/$discoveryId/edit', extra: discovery),
           onDelete: () => _confirmDelete(context, ref, discovery),
         );
       },
@@ -86,7 +84,9 @@ class DiscoveryDetailScreen extends ConsumerWidget {
       await DeleteDiscovery(ref.read(discoveryRepositoryProvider))(
         discovery.id,
       );
-      if (context.mounted) context.pop();
+      if (context.mounted) {
+        context.canPop() ? context.pop() : context.go('/map');
+      }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(
@@ -117,6 +117,10 @@ class _DiscoveryDetailView extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        leading: BackButton(
+          onPressed: () =>
+              context.canPop() ? context.pop() : context.go('/map'),
+        ),
         title: Text(discovery.title),
         actions: [
           if (isAdmin)
@@ -178,7 +182,7 @@ class _DiscoveryDetailView extends StatelessWidget {
                           child: CircularProgressIndicator(
                             value: progress.expectedTotalBytes != null
                                 ? progress.cumulativeBytesLoaded /
-                                    progress.expectedTotalBytes!
+                                      progress.expectedTotalBytes!
                                 : null,
                           ),
                         ),
@@ -275,9 +279,7 @@ class _ColorSwatch extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tt = Theme.of(context).textTheme;
-    final color = Color(
-      int.parse('0xFF${colorHex.replaceFirst('#', '')}'),
-    );
+    final color = Color(int.parse('0xFF${colorHex.replaceFirst('#', '')}'));
     return Row(
       children: [
         Container(

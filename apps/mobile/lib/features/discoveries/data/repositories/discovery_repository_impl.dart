@@ -9,10 +9,9 @@ class DiscoveryRepositoryImpl implements DiscoveryRepository {
   final FirestoreDiscoveryDatasource _datasource;
 
   @override
-  Stream<List<Discovery>> watchAllDiscoveries() =>
-      _datasource.watchAllDiscoveries().map(
-        (records) => records.map((r) => r.$2.toEntity(r.$1)).toList(),
-      );
+  Stream<List<Discovery>> watchAllDiscoveries() => _datasource
+      .watchAllDiscoveries()
+      .map((records) => records.map((r) => r.$2.toEntity(r.$1)).toList());
 
   @override
   Future<Discovery> getDiscoveryById(String id) async {
