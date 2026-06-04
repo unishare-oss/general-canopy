@@ -112,7 +112,9 @@ void main() {
 
       expect(find.text('Welcome to Canopy.'), findsOneWidget);
       expect(
-        find.text('Adopt a tree on your block, keep it alive, cool your city.'),
+        find.text(
+          'Adopt a tree on your block,\nkeep it alive, cool your city.',
+        ),
         findsOneWidget,
       );
       expect(find.widgetWithText(FilledButton, 'Get started'), findsOneWidget);
@@ -152,7 +154,7 @@ void main() {
       await tester.pump();
 
       // Select a neighbourhood
-      await tester.tap(find.text('East Park'));
+      await tester.tap(find.text(kNeighborhoods.first));
       await tester.pump();
 
       // Tap Next
@@ -270,7 +272,7 @@ void main() {
       await tester.pump();
 
       // The back button is an IconButton with arrow_back icon
-      await tester.tap(find.byIcon(Icons.arrow_back));
+      await tester.tap(find.byIcon(Icons.arrow_back_ios_new_rounded));
       await tester.pump();
 
       expect(find.text('Welcome to Canopy.'), findsOneWidget);

@@ -89,17 +89,11 @@ Widget _buildSubject() {
   );
 }
 
-/// Finds the "Sign up" TextButton in the mode-switch row (not the submit
-/// FilledButton which reads "Create account").
-Finder get _signUpLink => find.descendant(
-  of: find.byType(Row),
-  matching: find.widgetWithText(TextButton, 'Sign up'),
-);
+/// Finds the "Create account" tab used to switch to sign-up mode.
+Finder get _signUpLink => find.text('Create account');
 
-Finder get _signInLink => find.descendant(
-  of: find.byType(Row),
-  matching: find.widgetWithText(TextButton, 'Sign in'),
-);
+/// Finds the "Sign in" tab used to switch back to sign-in mode.
+Finder get _signInLink => find.text('Sign in');
 
 // ---------------------------------------------------------------------------
 // Tests
@@ -118,7 +112,7 @@ void main() {
         expect(find.text('Continue with Microsoft'), findsNothing);
         expect(find.byType(TextFormField), findsNWidgets(2));
         expect(_signUpLink, findsOneWidget);
-        expect(find.text('Continue as guest'), findsOneWidget);
+        expect(find.text('Browse as guest'), findsOneWidget);
       },
     );
 
@@ -147,7 +141,7 @@ void main() {
       await tester.pump();
 
       expect(
-        find.text('Adopt a tree. Keep it alive. Cool your city.'),
+        find.text('Adopt a tree. Keep it alive.\nCool your city.'),
         findsOneWidget,
       );
       // Old Unishare copy must be gone
@@ -173,8 +167,8 @@ void main() {
       );
       await tester.pump();
 
-      await tester.ensureVisible(find.text('Continue as guest'));
-      await tester.tap(find.text('Continue as guest'));
+      await tester.ensureVisible(find.text('Browse as guest'));
+      await tester.tap(find.text('Browse as guest'));
       await tester.pump();
 
       expect(fakeRepo.signInAnonymouslyCalled, isTrue);

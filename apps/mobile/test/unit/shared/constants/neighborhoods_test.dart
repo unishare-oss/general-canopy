@@ -4,15 +4,16 @@ import 'package:canopy/shared/constants/neighborhoods.dart';
 
 void main() {
   group('kNeighborhoods', () {
-    test('contains exactly 4 districts', () {
-      expect(kNeighborhoods.length, 4);
+    test('contains exactly 15 districts', () {
+      expect(kNeighborhoods.length, 15);
     });
 
-    test('contains the four specified district strings', () {
-      expect(kNeighborhoods, contains('Maple Heights'));
-      expect(kNeighborhoods, contains('East Park'));
-      expect(kNeighborhoods, contains('Westgate'));
-      expect(kNeighborhoods, contains('Riverside'));
+    test('contains the Bangkok district strings', () {
+      expect(kNeighborhoods, contains('Chatuchak'));
+      expect(kNeighborhoods, contains('Silom'));
+      expect(kNeighborhoods, contains('Lat Phrao'));
+      expect(kNeighborhoods, contains('Ari'));
+      expect(kNeighborhoods, contains('Thonglor'));
     });
 
     test('has no duplicates', () {
