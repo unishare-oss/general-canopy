@@ -82,7 +82,8 @@ class _GroveContent extends StatelessWidget {
     }
   }
 
-  int get _totalCount => saplings.isNotEmpty ? saplings.length : adoptedSaplings.length;
+  int get _totalCount =>
+      saplings.isNotEmpty ? saplings.length : adoptedSaplings.length;
 
   @override
   Widget build(BuildContext context) {
@@ -256,9 +257,7 @@ class _AdoptedSaplingCard extends StatelessWidget {
                   ),
                   Text(
                     sapling.species,
-                    style: tt.bodySmall?.copyWith(
-                      color: cs.onSurfaceVariant,
-                    ),
+                    style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
                   ),
                 ],
               ),

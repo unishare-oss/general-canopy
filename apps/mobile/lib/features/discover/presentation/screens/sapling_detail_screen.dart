@@ -91,9 +91,9 @@ class _SaplingDetailBodyState extends ConsumerState<_SaplingDetailBody> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Release failed: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Release failed: $e')));
       }
     } finally {
       if (mounted) setState(() => _isUnadopting = false);
