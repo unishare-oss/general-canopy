@@ -19,7 +19,7 @@
 const admin = require('firebase-admin');
 
 const ADMINS = [
-  { uid: 'REPLACE_WITH_YOUR_UID' },
+  { uid: '2uV98bLciuXoLTHlWYEa3dIPfjo1' },
 ];
 
 const args = process.argv.slice(2);
