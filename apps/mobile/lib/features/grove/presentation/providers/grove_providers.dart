@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'package:canopy/features/auth/presentation/providers/current_user_provider.dart';
@@ -10,6 +11,7 @@ import 'package:canopy/features/grove/domain/entities/sapling_photo.dart';
 import 'package:canopy/features/grove/domain/repositories/grove_repository.dart';
 import 'package:canopy/features/grove/domain/usecases/get_adoption_detail.dart';
 import 'package:canopy/features/grove/domain/usecases/get_care_history.dart';
+import 'package:canopy/features/grove/domain/usecases/log_care_event.dart';
 import 'package:canopy/features/grove/domain/usecases/watch_adoption_photos.dart';
 import 'package:canopy/features/grove/domain/usecases/watch_my_grove.dart';
 import 'package:canopy/features/saplings/domain/entities/sapling.dart';
@@ -44,6 +46,11 @@ WatchAdoptionPhotos watchAdoptionPhotos(Ref ref) =>
 @Riverpod(keepAlive: true)
 GetCareHistory getCareHistory(Ref ref) =>
     GetCareHistory(ref.watch(groveRepositoryProvider));
+
+// Plain provider — no codegen needed, keeps the generated file untouched.
+final logCareEventProvider = Provider<LogCareEvent>(
+  (ref) => LogCareEvent(ref.watch(groveRepositoryProvider)),
+);
 
 // ── UI-state providers ───────────────────────────────────────────────────────
 

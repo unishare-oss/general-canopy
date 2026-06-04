@@ -18,15 +18,10 @@ class MineTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final summaryAsync = ref.watch(impactSummaryProvider);
+    final summary = ref.watch(effectiveImpactSummaryProvider);
     final streaksAsync = ref.watch(saplingStreaksProvider);
     final achievementsAsync = ref.watch(achievementsProvider);
     final equivalents = ref.watch(impactEquivalentsProvider);
-
-    final summary = summaryAsync.maybeWhen(
-      data: (s) => s,
-      orElse: ImpactSummary.zero,
-    );
     final streaks = streaksAsync.maybeWhen(
       data: (s) => s,
       orElse: () => <SaplingStreak>[],
