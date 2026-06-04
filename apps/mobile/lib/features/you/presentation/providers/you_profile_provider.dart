@@ -4,6 +4,7 @@ import 'package:canopy/features/auth/domain/entities/plant_experience.dart';
 import 'package:canopy/features/auth/domain/usecases/update_user_profile.dart';
 import 'package:canopy/features/auth/presentation/providers/auth_repository_provider.dart';
 import 'package:canopy/features/auth/presentation/providers/current_user_provider.dart';
+import 'package:canopy/features/you/presentation/services/avatar_picker.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'you_profile_provider.g.dart';
@@ -45,6 +46,22 @@ class YouProfileController extends _$YouProfileController {
     NotificationPreferences preferences,
   ) => _save(uid, notificationPreferences: preferences);
 
+  /// Opens the image picker, compresses the chosen photo, and saves it as
+  /// the user's avatar. No-op when the user cancels the picker.
+  Future<void> updateAvatar(String uid) async {
+    final String? encoded;
+    try {
+      encoded = await ref.read(avatarPickerProvider).pickAndEncode();
+    } catch (_) {
+      state = state.copyWith(
+        error: 'Could not read that image. Please try another one.',
+      );
+      return;
+    }
+    if (encoded == null) return;
+    await _save(uid, avatarBase64: encoded);
+  }
+
   /// Writes the single changed field to Firestore (null fields are left
   /// unchanged by [UpdateUserProfile]). On success invalidates
   /// [currentUserProvider] so the screen re-reads fresh data — the
@@ -53,6 +70,7 @@ class YouProfileController extends _$YouProfileController {
   Future<void> _save(
     String uid, {
     String? name,
+    String? avatarBase64,
     String? neighborhood,
     CheckInFrequency? checkInFrequency,
     PlantExperience? plantExperience,
@@ -64,6 +82,7 @@ class YouProfileController extends _$YouProfileController {
       await UpdateUserProfile(repository).call(
         uid: uid,
         name: name,
+        avatarBase64: avatarBase64,
         neighborhood: neighborhood,
         checkInFrequency: checkInFrequency,
         plantExperience: plantExperience,

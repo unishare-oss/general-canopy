@@ -52,6 +52,7 @@ class _SpyAuthRepository implements AuthRepository {
   Future<void> updateUserProfile({
     required String uid,
     String? name,
+    String? avatarBase64,
     String? neighborhood,
     CheckInFrequency? checkInFrequency,
     PlantExperience? plantExperience,

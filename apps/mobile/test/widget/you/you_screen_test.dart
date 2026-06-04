@@ -6,9 +6,12 @@ import 'package:canopy/features/auth/domain/entities/app_user.dart';
 import 'package:canopy/features/auth/domain/entities/check_in_frequency.dart';
 import 'package:canopy/features/auth/domain/entities/notification_preferences.dart';
 import 'package:canopy/features/auth/domain/entities/plant_experience.dart';
+import 'package:canopy/core/notifications/notification_service.dart';
+import 'package:canopy/core/notifications/notification_service_provider.dart';
 import 'package:canopy/features/auth/domain/repositories/auth_repository.dart';
 import 'package:canopy/features/auth/presentation/providers/auth_repository_provider.dart';
 import 'package:canopy/features/you/presentation/screens/you_screen.dart';
+import 'package:canopy/features/you/presentation/services/avatar_picker.dart';
 import 'package:canopy/features/you/presentation/widgets/guest_profile_prompt.dart';
 import 'package:canopy/features/you/presentation/widgets/profile_field_row.dart';
 import 'package:canopy/shared/theme/app_theme.dart';
@@ -18,12 +21,48 @@ import 'package:canopy/shared/theme/themes.dart';
 // Fakes
 // ---------------------------------------------------------------------------
 
+class _FakeNotificationService implements NotificationService {
+  _FakeNotificationService({this.grant = true});
+
+  bool grant;
+  int permissionRequests = 0;
+  final List<String> shownTitles = [];
+
+  @override
+  bool get isSupported => true;
+
+  @override
+  Future<bool> requestPermission() async {
+    permissionRequests++;
+    return grant;
+  }
+
+  @override
+  Future<void> show({required String title, required String body}) async {
+    shownTitles.add(title);
+  }
+}
+
+class _FakeAvatarPicker extends AvatarPicker {
+  String? result;
+  int callCount = 0;
+
+  @override
+  Future<String?> pickAndEncode() async {
+    callCount++;
+    return result;
+  }
+}
+
 class _FakeAuthRepository implements AuthRepository {
   _FakeAuthRepository({this.user});
 
   /// Emitted on the auth stream and returned by getCurrentUser.
   final AppUser? user;
   bool signOutCalled = false;
+  int updateCallCount = 0;
+  NotificationPreferences? lastNotificationPreferences;
+  String? lastAvatarBase64;
 
   @override
   Stream<AppUser?> get authStateChanges => Stream.value(user);
@@ -59,12 +98,17 @@ class _FakeAuthRepository implements AuthRepository {
   Future<void> updateUserProfile({
     required String uid,
     String? name,
+    String? avatarBase64,
     String? neighborhood,
     CheckInFrequency? checkInFrequency,
     PlantExperience? plantExperience,
     NotificationPreferences? notificationPreferences,
     bool? onboardingComplete,
-  }) async {}
+  }) async {
+    updateCallCount++;
+    lastNotificationPreferences = notificationPreferences;
+    lastAvatarBase64 = avatarBase64;
+  }
 
   @override
   Future<AppUser> linkAnonymousAccount({
@@ -105,9 +149,19 @@ const _guestUser = AppUser(
   isAnonymous: true,
 );
 
-Widget _buildSubject(_FakeAuthRepository repo) {
+Widget _buildSubject(
+  _FakeAuthRepository repo, {
+  _FakeNotificationService? notifications,
+  _FakeAvatarPicker? picker,
+}) {
   return ProviderScope(
-    overrides: [authRepositoryProvider.overrideWithValue(repo)],
+    overrides: [
+      authRepositoryProvider.overrideWithValue(repo),
+      notificationServiceProvider.overrideWithValue(
+        notifications ?? _FakeNotificationService(),
+      ),
+      avatarPickerProvider.overrideWithValue(picker ?? _FakeAvatarPicker()),
+    ],
     child: MaterialApp(
       theme: AppTheme.build(AppThemes.canopy),
       home: const YouScreen(),
@@ -231,6 +285,104 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(repo.signOutCalled, isFalse);
+    });
+  });
+
+  group('YouScreen — notifications', () {
+    testWidgets(
+      'toggling ON requests permission, saves, and shows a confirmation',
+      (tester) async {
+        final repo = _FakeAuthRepository(user: _fullUser);
+        final notifications = _FakeNotificationService();
+        await tester.pumpWidget(
+          _buildSubject(repo, notifications: notifications),
+        );
+        await tester.pumpAndSettle();
+
+        // cityAlerts is OFF in the fixture — turn it on.
+        await tester.scrollUntilVisible(find.text('City alerts'), 100);
+        await tester.tap(find.text('City alerts'));
+        await tester.pumpAndSettle();
+
+        expect(notifications.permissionRequests, 1);
+        expect(repo.updateCallCount, 1);
+        expect(repo.lastNotificationPreferences!.cityAlerts, isTrue);
+        expect(notifications.shownTitles, ['City alerts on']);
+      },
+    );
+
+    testWidgets('denied permission shows a snackbar and does not save', (
+      tester,
+    ) async {
+      final repo = _FakeAuthRepository(user: _fullUser);
+      final notifications = _FakeNotificationService(grant: false);
+      await tester.pumpWidget(
+        _buildSubject(repo, notifications: notifications),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.scrollUntilVisible(find.text('City alerts'), 100);
+      await tester.tap(find.text('City alerts'));
+      await tester.pumpAndSettle();
+
+      expect(notifications.permissionRequests, 1);
+      expect(repo.updateCallCount, 0);
+      expect(notifications.shownTitles, isEmpty);
+      expect(find.textContaining('Notifications are blocked'), findsOneWidget);
+    });
+
+    testWidgets('toggling OFF saves without requesting permission', (
+      tester,
+    ) async {
+      final repo = _FakeAuthRepository(user: _fullUser);
+      final notifications = _FakeNotificationService();
+      await tester.pumpWidget(
+        _buildSubject(repo, notifications: notifications),
+      );
+      await tester.pumpAndSettle();
+
+      // wateringReminders is ON in the fixture — turn it off.
+      await tester.scrollUntilVisible(find.text('Watering reminders'), 100);
+      await tester.tap(find.text('Watering reminders'));
+      await tester.pumpAndSettle();
+
+      expect(notifications.permissionRequests, 0);
+      expect(repo.updateCallCount, 1);
+      expect(repo.lastNotificationPreferences!.wateringReminders, isFalse);
+      expect(notifications.shownTitles, isEmpty);
+    });
+  });
+
+  group('YouScreen — avatar', () {
+    testWidgets('avatar shows a camera badge and tap opens the picker', (
+      tester,
+    ) async {
+      final repo = _FakeAuthRepository(user: _fullUser);
+      final picker = _FakeAvatarPicker()..result = 'ZmFrZS1qcGVn';
+      await tester.pumpWidget(_buildSubject(repo, picker: picker));
+      await tester.pumpAndSettle();
+
+      expect(find.byIcon(Icons.photo_camera), findsOneWidget);
+
+      await tester.tap(find.byType(CircleAvatar));
+      await tester.pumpAndSettle();
+
+      expect(picker.callCount, 1);
+      expect(repo.updateCallCount, 1);
+      expect(repo.lastAvatarBase64, 'ZmFrZS1qcGVn');
+    });
+
+    testWidgets('cancelling the picker saves nothing', (tester) async {
+      final repo = _FakeAuthRepository(user: _fullUser);
+      final picker = _FakeAvatarPicker()..result = null;
+      await tester.pumpWidget(_buildSubject(repo, picker: picker));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(CircleAvatar));
+      await tester.pumpAndSettle();
+
+      expect(picker.callCount, 1);
+      expect(repo.updateCallCount, 0);
     });
   });
 

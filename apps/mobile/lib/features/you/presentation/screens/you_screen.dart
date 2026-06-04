@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:canopy/core/notifications/notification_service_provider.dart';
 import 'package:canopy/features/auth/domain/entities/app_user.dart';
 import 'package:canopy/features/auth/domain/entities/check_in_frequency.dart';
 import 'package:canopy/features/auth/domain/entities/plant_experience.dart';
@@ -178,6 +179,55 @@ class _ProfileContent extends ConsumerWidget {
     }
   }
 
+  /// Turning a notification preference ON requests platform permission
+  /// first; the preference is only saved (and a confirmation notification
+  /// shown) when permission is granted. Turning OFF just saves.
+  Future<void> _toggleNotification(
+    BuildContext context,
+    WidgetRef ref, {
+    required bool enable,
+    required bool isWatering,
+  }) async {
+    final notifier = ref.read(youProfileControllerProvider.notifier);
+    final prefs = user.notificationPreferences;
+    final updated = isWatering
+        ? prefs.copyWith(wateringReminders: enable)
+        : prefs.copyWith(cityAlerts: enable);
+
+    if (!enable) {
+      await notifier.updateNotifications(user.id, updated);
+      return;
+    }
+
+    final notifications = ref.read(notificationServiceProvider);
+    final granted = await notifications.requestPermission();
+    if (!granted) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              notifications.isSupported
+                  ? 'Notifications are blocked — allow them in your '
+                        'browser settings and try again.'
+                  : 'Notifications are not supported on this platform yet.',
+            ),
+          ),
+        );
+      }
+      return;
+    }
+
+    await notifier.updateNotifications(user.id, updated);
+    if (ref.read(youProfileControllerProvider).error == null) {
+      await notifications.show(
+        title: isWatering ? 'Watering reminders on' : 'City alerts on',
+        body: isWatering
+            ? "We'll nudge you when your saplings are thirsty. 🌱"
+            : "We'll alert you about tree news in your city. 🏙️",
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tt = Theme.of(context).textTheme;
@@ -189,7 +239,14 @@ class _ProfileContent extends ConsumerWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
       children: [
-        ProfileHeader(user: user),
+        ProfileHeader(
+          user: user,
+          onEditAvatar: isSaving
+              ? null
+              : () => ref
+                    .read(youProfileControllerProvider.notifier)
+                    .updateAvatar(user.id),
+        ),
         const _SectionHeader('Preferences'),
         Card(
           clipBehavior: Clip.antiAlias,
@@ -236,12 +293,12 @@ class _ProfileContent extends ConsumerWidget {
                 value: prefs.wateringReminders,
                 onChanged: isSaving
                     ? null
-                    : (value) => ref
-                          .read(youProfileControllerProvider.notifier)
-                          .updateNotifications(
-                            user.id,
-                            prefs.copyWith(wateringReminders: value),
-                          ),
+                    : (value) => _toggleNotification(
+                        context,
+                        ref,
+                        enable: value,
+                        isWatering: true,
+                      ),
               ),
               const Divider(height: 1),
               SwitchListTile(
@@ -250,12 +307,12 @@ class _ProfileContent extends ConsumerWidget {
                 value: prefs.cityAlerts,
                 onChanged: isSaving
                     ? null
-                    : (value) => ref
-                          .read(youProfileControllerProvider.notifier)
-                          .updateNotifications(
-                            user.id,
-                            prefs.copyWith(cityAlerts: value),
-                          ),
+                    : (value) => _toggleNotification(
+                        context,
+                        ref,
+                        enable: value,
+                        isWatering: false,
+                      ),
               ),
             ],
           ),

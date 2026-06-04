@@ -9,7 +9,12 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if request.auth != null && request.auth.uid == userId;
       allow create: if request.auth != null && request.auth.uid == userId;
-      allow update: if request.auth != null && request.auth.uid == userId;
+      // avatarBase64 is a ~256px JPEG as base64; cap it well below the
+      // 1 MiB document limit to prevent abuse.
+      allow update: if request.auth != null && request.auth.uid == userId
+        && (!request.resource.data.keys().hasAny(['avatarBase64'])
+            || (request.resource.data.avatarBase64 is string
+                && request.resource.data.avatarBase64.size() < 131072));
       allow delete: if false;
     }
 

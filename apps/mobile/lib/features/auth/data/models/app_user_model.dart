@@ -18,6 +18,7 @@ abstract class AppUserModel with _$AppUserModel {
     required String name,
     required String email,
     String? photoUrl,
+    String? avatarBase64,
     String? neighborhood,
     String? checkInFrequency, // serialised enum name
     String? plantExperience, // serialised enum name
@@ -40,6 +41,7 @@ abstract class AppUserModel with _$AppUserModel {
       name: data['name'] as String? ?? '',
       email: data['email'] as String? ?? '',
       photoUrl: data['photoUrl'] as String?,
+      avatarBase64: data['avatarBase64'] as String?,
       neighborhood: data['neighborhood'] as String?,
       checkInFrequency: data['checkInFrequency'] as String?,
       plantExperience: data['plantExperience'] as String?,
@@ -54,6 +56,7 @@ abstract class AppUserModel with _$AppUserModel {
     name: name,
     email: email,
     photoUrl: photoUrl,
+    avatarBase64: avatarBase64,
     neighborhood: neighborhood,
     checkInFrequency: checkInFrequency != null
         ? CheckInFrequency.values.firstWhere((e) => e.name == checkInFrequency)

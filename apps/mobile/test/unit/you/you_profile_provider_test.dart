@@ -8,16 +8,31 @@ import 'package:canopy/features/auth/domain/entities/plant_experience.dart';
 import 'package:canopy/features/auth/domain/repositories/auth_repository.dart';
 import 'package:canopy/features/auth/presentation/providers/auth_repository_provider.dart';
 import 'package:canopy/features/you/presentation/providers/you_profile_provider.dart';
+import 'package:canopy/features/you/presentation/services/avatar_picker.dart';
 
 // ---------------------------------------------------------------------------
 // Fake repository — captures updateUserProfile args, simulates failure
 // ---------------------------------------------------------------------------
+
+class _FakeAvatarPicker extends AvatarPicker {
+  String? result;
+  bool shouldThrow = false;
+  int callCount = 0;
+
+  @override
+  Future<String?> pickAndEncode() async {
+    callCount++;
+    if (shouldThrow) throw Exception('decode failed');
+    return result;
+  }
+}
 
 class _FakeAuthRepository implements AuthRepository {
   bool shouldThrow = false;
   int updateCallCount = 0;
   String? lastUid;
   String? lastName;
+  String? lastAvatarBase64;
   String? lastNeighborhood;
   CheckInFrequency? lastFrequency;
   PlantExperience? lastExperience;
@@ -56,6 +71,7 @@ class _FakeAuthRepository implements AuthRepository {
   Future<void> updateUserProfile({
     required String uid,
     String? name,
+    String? avatarBase64,
     String? neighborhood,
     CheckInFrequency? checkInFrequency,
     PlantExperience? plantExperience,
@@ -65,6 +81,7 @@ class _FakeAuthRepository implements AuthRepository {
     updateCallCount++;
     lastUid = uid;
     lastName = name;
+    lastAvatarBase64 = avatarBase64;
     lastNeighborhood = neighborhood;
     lastFrequency = checkInFrequency;
     lastExperience = plantExperience;
@@ -82,12 +99,17 @@ class _FakeAuthRepository implements AuthRepository {
 
 void main() {
   late _FakeAuthRepository fakeRepo;
+  late _FakeAvatarPicker fakePicker;
   late ProviderContainer container;
 
   setUp(() {
     fakeRepo = _FakeAuthRepository();
+    fakePicker = _FakeAvatarPicker();
     container = ProviderContainer(
-      overrides: [authRepositoryProvider.overrideWithValue(fakeRepo)],
+      overrides: [
+        authRepositoryProvider.overrideWithValue(fakeRepo),
+        avatarPickerProvider.overrideWithValue(fakePicker),
+      ],
     );
   });
 
@@ -190,6 +212,39 @@ void main() {
       expect(state.isSaving, isFalse);
       expect(state.error, isNotNull);
       expect(state.error, isNotEmpty);
+    });
+
+    test('updateAvatar saves the encoded image from the picker', () async {
+      fakePicker.result = 'ZmFrZS1qcGVn';
+      final notifier = container.read(youProfileControllerProvider.notifier);
+
+      await notifier.updateAvatar('uid-1');
+
+      expect(fakePicker.callCount, 1);
+      expect(fakeRepo.updateCallCount, 1);
+      expect(fakeRepo.lastUid, 'uid-1');
+      expect(fakeRepo.lastAvatarBase64, 'ZmFrZS1qcGVn');
+      expect(fakeRepo.lastName, isNull);
+    });
+
+    test('updateAvatar does nothing when the picker is cancelled', () async {
+      fakePicker.result = null;
+      final notifier = container.read(youProfileControllerProvider.notifier);
+
+      await notifier.updateAvatar('uid-1');
+
+      expect(fakeRepo.updateCallCount, 0);
+      expect(container.read(youProfileControllerProvider).error, isNull);
+    });
+
+    test('updateAvatar sets error when the picker throws', () async {
+      fakePicker.shouldThrow = true;
+      final notifier = container.read(youProfileControllerProvider.notifier);
+
+      await notifier.updateAvatar('uid-1');
+
+      expect(fakeRepo.updateCallCount, 0);
+      expect(container.read(youProfileControllerProvider).error, isNotNull);
     });
 
     test('a save after a failure clears the previous error', () async {
