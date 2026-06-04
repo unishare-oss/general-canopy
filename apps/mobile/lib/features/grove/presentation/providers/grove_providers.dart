@@ -12,6 +12,8 @@ import 'package:canopy/features/grove/domain/usecases/get_adoption_detail.dart';
 import 'package:canopy/features/grove/domain/usecases/get_care_history.dart';
 import 'package:canopy/features/grove/domain/usecases/watch_adoption_photos.dart';
 import 'package:canopy/features/grove/domain/usecases/watch_my_grove.dart';
+import 'package:canopy/features/saplings/domain/entities/sapling.dart';
+import 'package:canopy/features/saplings/presentation/providers/sapling_repository_provider.dart';
 
 part 'grove_providers.g.dart';
 
@@ -50,6 +52,16 @@ Stream<List<AdoptedSapling>> myGrove(Ref ref) {
   final uid = ref.watch(currentUserProvider).asData?.value?.id ?? '';
   if (uid.isEmpty) return const Stream.empty();
   return ref.watch(watchMyGroveProvider).call(uid);
+}
+
+@riverpod
+Stream<List<Sapling>> myAdoptedSaplings(Ref ref) {
+  final uid = ref.watch(currentUserProvider).asData?.value?.id ?? '';
+  if (uid.isEmpty) return const Stream.empty();
+  return ref
+      .watch(saplingRepositoryProvider)
+      .getAllSaplings()
+      .map((all) => all.where((s) => s.adoptedBy == uid).toList());
 }
 
 @riverpod

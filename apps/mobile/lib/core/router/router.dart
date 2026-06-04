@@ -17,6 +17,9 @@ import 'package:canopy/features/grove/presentation/screens/sapling_detail_screen
 import 'package:canopy/features/map/presentation/screens/map_screen.dart';
 import 'package:canopy/features/impact/presentation/screens/impact_screen.dart';
 import 'package:canopy/features/you/presentation/screens/you_screen.dart';
+import 'package:canopy/features/discoveries/domain/entities/discovery.dart';
+import 'package:canopy/features/discoveries/presentation/screens/create_edit_discovery_screen.dart';
+import 'package:canopy/features/discoveries/presentation/screens/discovery_detail_screen.dart';
 
 part 'router.g.dart';
 
@@ -122,6 +125,23 @@ GoRouter router(Ref ref) {
         path: '/sapling/:id',
         builder: (context, state) => discover.SaplingDetailScreen(
           saplingId: state.pathParameters['id']!,
+        ),
+      ),
+      // Discovery routes — create must be listed before :id to avoid collision.
+      GoRoute(
+        path: '/discovery/create',
+        builder: (c, s) => const CreateEditDiscoveryScreen(),
+      ),
+      GoRoute(
+        path: '/discovery/:id/edit',
+        builder: (c, s) => CreateEditDiscoveryScreen(
+          discovery: s.extra as Discovery?,
+        ),
+      ),
+      GoRoute(
+        path: '/discovery/:id',
+        builder: (c, s) => DiscoveryDetailScreen(
+          discoveryId: s.pathParameters['id']!,
         ),
       ),
       StatefulShellRoute.indexedStack(

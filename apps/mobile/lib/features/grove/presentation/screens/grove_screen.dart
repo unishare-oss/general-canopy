@@ -6,6 +6,7 @@ import 'package:canopy/features/auth/presentation/providers/current_user_provide
 import 'package:canopy/features/grove/domain/entities/adopted_sapling.dart';
 import 'package:canopy/features/grove/presentation/providers/grove_providers.dart';
 import 'package:canopy/features/grove/presentation/widgets/sapling_card.dart';
+import 'package:canopy/features/saplings/domain/entities/sapling.dart';
 
 class GroveScreen extends ConsumerWidget {
   const GroveScreen({super.key});
@@ -17,6 +18,7 @@ class GroveScreen extends ConsumerWidget {
     final groveAsync = ref.watch(myGroveProvider);
     final user = ref.watch(currentUserProvider).asData?.value;
 
+    final adoptedAsync = ref.watch(myAdoptedSaplingsProvider);
     final greeting = _greeting();
     final displayName = user?.name.split(' ').first ?? 'there';
 
@@ -43,6 +45,7 @@ class GroveScreen extends ConsumerWidget {
         ),
         data: (saplings) => _GroveContent(
           saplings: saplings,
+          adoptedSaplings: adoptedAsync.asData?.value ?? [],
           greeting: greeting,
           displayName: displayName,
         ),
@@ -61,11 +64,13 @@ class GroveScreen extends ConsumerWidget {
 class _GroveContent extends StatelessWidget {
   const _GroveContent({
     required this.saplings,
+    required this.adoptedSaplings,
     required this.greeting,
     required this.displayName,
   });
 
   final List<AdoptedSapling> saplings;
+  final List<Sapling> adoptedSaplings;
   final String greeting;
   final String displayName;
 
@@ -76,6 +81,8 @@ class _GroveContent extends StatelessWidget {
       return null;
     }
   }
+
+  int get _totalCount => saplings.isNotEmpty ? saplings.length : adoptedSaplings.length;
 
   @override
   Widget build(BuildContext context) {
@@ -100,10 +107,10 @@ class _GroveContent extends StatelessWidget {
                     height: 1.1,
                   ),
                 ),
-                if (saplings.isNotEmpty) ...[
+                if (_totalCount > 0) ...[
                   const SizedBox(height: 4),
                   Text(
-                    'Guardian of ${saplings.length} tree${saplings.length == 1 ? '' : 's'}',
+                    'Guardian of $_totalCount tree${_totalCount == 1 ? '' : 's'}',
                     style: tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
                   ),
                 ],
@@ -113,7 +120,7 @@ class _GroveContent extends StatelessWidget {
                 if (urgent != null) _UrgentBanner(sapling: urgent),
 
                 // Stats row
-                if (saplings.isNotEmpty) ...[
+                if (_totalCount > 0) ...[
                   const SizedBox(height: 16),
                   _StatsRow(saplings: saplings),
                 ],
@@ -142,7 +149,7 @@ class _GroveContent extends StatelessWidget {
         ),
 
         // Empty state or sapling list
-        if (saplings.isEmpty)
+        if (saplings.isEmpty && adoptedSaplings.isEmpty)
           SliverFillRemaining(
             child: Center(
               child: Padding(
@@ -176,7 +183,7 @@ class _GroveContent extends StatelessWidget {
               ),
             ),
           )
-        else
+        else if (saplings.isNotEmpty)
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
             sliver: SliverList.separated(
@@ -187,8 +194,79 @@ class _GroveContent extends StatelessWidget {
                 onTap: () => context.go('/grove/sapling/${saplings[i].id}'),
               ),
             ),
+          )
+        else
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+            sliver: SliverList.separated(
+              itemCount: adoptedSaplings.length,
+              separatorBuilder: (_, _) => const SizedBox(height: 10),
+              itemBuilder: (context, i) {
+                final s = adoptedSaplings[i];
+                return _AdoptedSaplingCard(
+                  sapling: s,
+                  onTap: () => context.go('/sapling/${s.id}'),
+                );
+              },
+            ),
           ),
       ],
+    );
+  }
+}
+
+class _AdoptedSaplingCard extends StatelessWidget {
+  const _AdoptedSaplingCard({required this.sapling, required this.onTap});
+  final Sapling sapling;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: cs.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: cs.primaryContainer,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(Icons.park, color: cs.onPrimaryContainer),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    sapling.nickname,
+                    style: tt.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+                  ),
+                  Text(
+                    sapling.species,
+                    style: tt.bodySmall?.copyWith(
+                      color: cs.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right, color: cs.onSurfaceVariant),
+          ],
+        ),
+      ),
     );
   }
 }

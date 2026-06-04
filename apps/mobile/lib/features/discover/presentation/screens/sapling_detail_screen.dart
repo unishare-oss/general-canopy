@@ -89,10 +89,10 @@ class _SaplingDetailBodyState extends ConsumerState<_SaplingDetailBody> {
           ),
         );
       }
-    } catch (_) {
+    } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Release failed. Please try again.')),
+          SnackBar(content: Text('Release failed: $e')),
         );
       }
     } finally {

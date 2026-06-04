@@ -20,6 +20,13 @@
       "fields": [
         { "fieldPath": "performedAt", "order": "DESCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "discoveries",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []
