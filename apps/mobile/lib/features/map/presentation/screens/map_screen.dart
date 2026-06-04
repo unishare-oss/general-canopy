@@ -5,6 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:go_router/go_router.dart';
+import 'package:canopy/features/admin/presentation/providers/is_admin_provider.dart';
+import 'package:canopy/features/discoveries/domain/entities/discovery.dart';
+import 'package:canopy/features/discoveries/presentation/providers/watch_all_discoveries_provider.dart';
 import 'package:canopy/features/saplings/domain/entities/sapling.dart';
 import 'package:canopy/features/saplings/presentation/providers/available_saplings_provider.dart';
 
@@ -23,16 +26,25 @@ class MapScreen extends ConsumerWidget {
   }
 }
 
-class _SaplingMap extends StatelessWidget {
+class _SaplingMap extends ConsumerWidget {
   const _SaplingMap({required this.saplings});
 
   final List<Sapling> saplings;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     const defaultCenter = LatLng(13.7563, 100.5018);
 
-    final markers = saplings.map((s) {
+    final discoveriesAsync = ref.watch(watchAllDiscoveriesProvider);
+    final isAdmin = ref.watch(isAdminProvider).value ?? false;
+
+    final discoveries = discoveriesAsync.when(
+      data: (d) => d,
+      loading: () => <Discovery>[],
+      error: (_, _) => <Discovery>[],
+    );
+
+    final saplingMarkers = saplings.map((s) {
       final color = Color(int.parse('0xFF${s.colorHex.replaceFirst('#', '')}'));
       final isAdopted = !s.isAvailable;
       final markerWidth = isAdopted ? 88.0 : 42.0;
@@ -54,6 +66,36 @@ class _SaplingMap extends StatelessWidget {
       );
     }).toList();
 
+    final discoveryMarkers = discoveries.map((d) {
+      final color = Color(int.parse('0xFF${d.colorHex.replaceFirst('#', '')}'));
+      return Marker(
+        point: LatLng(d.lat, d.lng),
+        width: 40,
+        height: 40,
+        alignment: Alignment.center,
+        child: GestureDetector(
+          onTap: () => context.push('/discovery/${d.id}'),
+          child: Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white, width: 2),
+              boxShadow: [
+                BoxShadow(
+                  color: color.withValues(alpha: 0.45),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: const Icon(Icons.place, size: 20, color: Colors.white),
+          ),
+        ),
+      );
+    }).toList();
+
     return Stack(
       children: [
         FlutterMap(
@@ -66,10 +108,20 @@ class _SaplingMap extends StatelessWidget {
               urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
               userAgentPackageName: 'com.canopy.app',
             ),
-            MarkerLayer(markers: markers),
+            MarkerLayer(markers: saplingMarkers),
+            MarkerLayer(markers: discoveryMarkers),
           ],
         ),
         Positioned(top: 12, right: 12, child: _LegendButton()),
+        if (isAdmin)
+          Positioned(
+            bottom: 16,
+            right: 16,
+            child: FloatingActionButton(
+              onPressed: () => context.push('/discovery/create'),
+              child: const Icon(Icons.add),
+            ),
+          ),
       ],
     );
   }
@@ -130,6 +182,13 @@ class _LegendButton extends StatelessWidget {
                 color: cs.tertiary,
                 label: 'Adopted',
                 description: 'A community member is caring for this tree.',
+              ),
+              const SizedBox(height: 12),
+              _LegendRow(
+                icon: Icons.place,
+                color: cs.secondary,
+                label: 'Discovery',
+                description: 'A point of interest in the urban forest.',
               ),
             ],
           ),

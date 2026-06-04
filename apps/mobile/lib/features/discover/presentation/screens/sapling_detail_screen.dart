@@ -27,7 +27,12 @@ class SaplingDetailScreen extends ConsumerWidget {
     final saplingAsync = ref.watch(_saplingByIdProvider(saplingId));
 
     return Scaffold(
-      appBar: AppBar(leading: BackButton(onPressed: () => context.pop())),
+      appBar: AppBar(
+        leading: BackButton(
+          onPressed: () =>
+              context.canPop() ? context.pop() : context.go('/map'),
+        ),
+      ),
       body: saplingAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => const Center(child: Text('Could not load sapling.')),
@@ -89,11 +94,11 @@ class _SaplingDetailBodyState extends ConsumerState<_SaplingDetailBody> {
           ),
         );
       }
-    } catch (_) {
+    } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Release failed. Please try again.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Release failed: $e')));
       }
     } finally {
       if (mounted) setState(() => _isUnadopting = false);

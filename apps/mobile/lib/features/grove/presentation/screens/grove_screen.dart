@@ -22,6 +22,7 @@ class GroveScreen extends ConsumerWidget {
     final user = ref.watch(currentUserProvider).asData?.value;
     final availableAsync = ref.watch(availableSaplingsProvider);
 
+    final adoptedAsync = ref.watch(myAdoptedSaplingsProvider);
     final greeting = _greeting();
     final displayName = user?.name.split(' ').first ?? 'there';
 
@@ -48,6 +49,7 @@ class GroveScreen extends ConsumerWidget {
         ),
         data: (saplings) => _GroveContent(
           saplings: saplings,
+          adoptedSaplings: adoptedAsync.asData?.value ?? [],
           greeting: greeting,
           displayName: displayName,
           uid: user?.id ?? '',
@@ -71,6 +73,7 @@ class GroveScreen extends ConsumerWidget {
 class _GroveContent extends StatelessWidget {
   const _GroveContent({
     required this.saplings,
+    required this.adoptedSaplings,
     required this.greeting,
     required this.displayName,
     required this.uid,
@@ -78,6 +81,7 @@ class _GroveContent extends StatelessWidget {
   });
 
   final List<AdoptedSapling> saplings;
+  final List<Sapling> adoptedSaplings;
   final String greeting;
   final String displayName;
   final String uid;
@@ -93,6 +97,9 @@ class _GroveContent extends StatelessWidget {
     );
     return DateTime.now().difference(earliest.adoptedAt).inDays;
   }
+
+  int get _totalCount =>
+      saplings.isNotEmpty ? saplings.length : adoptedSaplings.length;
 
   @override
   Widget build(BuildContext context) {
@@ -225,7 +232,7 @@ class _GroveContent extends StatelessWidget {
               ),
             ),
           )
-        else
+        else if (saplings.isNotEmpty)
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             sliver: SliverList.separated(
@@ -263,6 +270,21 @@ class _GroveContent extends StatelessWidget {
                   ),
                 ],
               ),
+            ),
+          )
+        else
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+            sliver: SliverList.separated(
+              itemCount: adoptedSaplings.length,
+              separatorBuilder: (_, _) => const SizedBox(height: 10),
+              itemBuilder: (context, i) {
+                final s = adoptedSaplings[i];
+                return _AdoptedSaplingCard(
+                  sapling: s,
+                  onTap: () => context.go('/sapling/${s.id}'),
+                );
+              },
             ),
           ),
           SliverToBoxAdapter(child: _OnYourBlock(saplings: availableSaplings)),
