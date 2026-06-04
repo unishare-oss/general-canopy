@@ -9,6 +9,7 @@ import 'package:canopy/features/auth/presentation/screens/onboarding_screen.dart
 import 'package:canopy/features/auth/presentation/screens/welcome_screen.dart';
 import 'package:canopy/core/router/shell_scaffold.dart';
 import 'package:canopy/features/discover/presentation/screens/discover_screen.dart';
+import 'package:canopy/features/discover/presentation/screens/sapling_detail_screen.dart';
 import 'package:canopy/features/grove/presentation/screens/grove_screen.dart';
 import 'package:canopy/features/grove/presentation/screens/sapling_detail_screen.dart';
 import 'package:canopy/features/map/presentation/screens/map_screen.dart';
@@ -107,6 +108,12 @@ GoRouter router(Ref ref) {
       GoRoute(
         path: '/onboarding',
         builder: (context, state) => const OnboardingScreen(),
+      ),
+      // Top-level route so it can be pushed from any tab (Discover or Map).
+      GoRoute(
+        path: '/sapling/:id',
+        builder: (context, state) =>
+            SaplingDetailScreen(saplingId: state.pathParameters['id']!),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>

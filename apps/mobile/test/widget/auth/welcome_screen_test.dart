@@ -89,10 +89,10 @@ Widget _buildSubject() {
   );
 }
 
-/// Finds the "Create account" tab used to switch to sign-up mode.
+/// Finds the "Create account" tab (switches from sign-in to sign-up mode).
 Finder get _signUpLink => find.text('Create account');
 
-/// Finds the "Sign in" tab used to switch back to sign-in mode.
+/// Finds the "Sign in" tab (visible when in sign-up mode).
 Finder get _signInLink => find.text('Sign in');
 
 // ---------------------------------------------------------------------------

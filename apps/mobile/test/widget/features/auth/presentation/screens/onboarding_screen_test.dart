@@ -271,7 +271,7 @@ void main() {
       await tester.tap(find.widgetWithText(FilledButton, 'Get started'));
       await tester.pump();
 
-      // The back button is an IconButton with arrow_back icon
+      // The back button is an IconButton with arrow_back_ios_new_rounded icon
       await tester.tap(find.byIcon(Icons.arrow_back_ios_new_rounded));
       await tester.pump();
 
