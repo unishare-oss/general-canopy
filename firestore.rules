@@ -33,6 +33,47 @@ service cloud.firestore {
       allow write: if request.auth != null && request.auth.uid == userId;
     }
 
+    // ── Saplings ──────────────────────────────────────────────────────────────
+    // Any authenticated user (including anonymous/guest) may read sapling docs.
+    // Only a non-anonymous authenticated user may update a sapling, and only
+    // to perform a valid adoption transition. No client create or delete.
+    match /saplings/{saplingId} {
+      allow read: if request.auth != null;
+
+      allow update: if request.auth != null
+        && request.auth.token.firebase.sign_in_provider != 'anonymous'
+        && (
+          // Adoption: available → adopted by the requesting user
+          (resource.data.status == 'available'
+            && request.resource.data.status == 'adopted'
+            && request.resource.data.adoptedBy == request.auth.uid)
+          ||
+          // Unadoption: adopted → available by the current adopter only
+          (resource.data.status == 'adopted'
+            && resource.data.adoptedBy == request.auth.uid
+            && request.resource.data.status == 'available')
+        );
+
+      allow create: if false;
+      allow delete: if false;
+    }
+
+    // ── Adoptions (My Grove) ─────────────────────────────────────────────
+    match /users/{userId}/adoptions/{adoptionId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if false;
+
+      match /photos/{photoId} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+        allow write: if false;
+      }
+
+      match /history/{historyId} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+        allow write: if false;
+      }
+    }
+
     // ── Default deny ──────────────────────────────────────────────────────
     // Every other collection is locked down until you add an explicit rule.
     // Add new `match` blocks above this line as you build features.

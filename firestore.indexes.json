@@ -14,6 +14,27 @@
       "fields": [
         { "fieldPath": "timestamp", "order": "DESCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "adoptions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "nextActionAt", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "photos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "takenAt", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "history",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "performedAt", "order": "DESCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []

@@ -9,7 +9,11 @@ import 'package:canopy/features/auth/presentation/screens/onboarding_screen.dart
 import 'package:canopy/features/auth/presentation/screens/welcome_screen.dart';
 import 'package:canopy/core/router/shell_scaffold.dart';
 import 'package:canopy/features/discover/presentation/screens/discover_screen.dart';
+import 'package:canopy/features/discover/presentation/screens/sapling_detail_screen.dart'
+    as discover;
 import 'package:canopy/features/grove/presentation/screens/grove_screen.dart';
+import 'package:canopy/features/grove/presentation/screens/sapling_detail_screen.dart'
+    as grove;
 import 'package:canopy/features/map/presentation/screens/map_screen.dart';
 import 'package:canopy/features/impact/presentation/screens/impact_screen.dart';
 import 'package:canopy/features/you/presentation/screens/you_screen.dart';
@@ -107,6 +111,13 @@ GoRouter router(Ref ref) {
         path: '/onboarding',
         builder: (context, state) => const OnboardingScreen(),
       ),
+      // Top-level route so it can be pushed from any tab (Discover or Map).
+      GoRoute(
+        path: '/sapling/:id',
+        builder: (context, state) => discover.SaplingDetailScreen(
+          saplingId: state.pathParameters['id']!,
+        ),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
             ShellScaffold(navigationShell: navigationShell),
@@ -126,7 +137,18 @@ GoRouter router(Ref ref) {
           ),
           StatefulShellBranch(
             routes: [
-              GoRoute(path: '/grove', builder: (c, s) => const GroveScreen()),
+              GoRoute(
+                path: '/grove',
+                builder: (c, s) => const GroveScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'sapling/:id',
+                    builder: (c, s) => grove.SaplingDetailScreen(
+                      adoptionId: s.pathParameters['id']!,
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
           StatefulShellBranch(
