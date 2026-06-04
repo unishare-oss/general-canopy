@@ -61,17 +61,19 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     } on StateError {
       // cancelled — silent
     } on AuthException catch (e) {
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text(e.userMessage)));
+      }
     } catch (_) {
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Something went wrong. Please try again.'),
           ),
         );
+      }
     } finally {
       if (mounted) setState(() => _googleLoading = false);
     }
@@ -91,10 +93,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     } on AuthException catch (e) {
       if (mounted) setState(() => _serverError = e.userMessage);
     } catch (_) {
-      if (mounted)
+      if (mounted) {
         setState(
           () => _serverError = 'Something went wrong. Please try again.',
         );
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -120,10 +123,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       if (mounted) setState(() => _serverError = e.userMessage);
     } catch (e, st) {
       debugPrint('Sign-up error: $e\n$st');
-      if (mounted)
+      if (mounted) {
         setState(
           () => _serverError = 'Something went wrong. Please try again.',
         );
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -271,8 +275,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               autofillHints: const [AutofillHints.name],
               validator: (v) {
                 if (v == null || v.trim().isEmpty) return 'Name is required';
-                if (v.trim().length < 2)
+                if (v.trim().length < 2) {
                   return 'Name must be at least 2 characters';
+                }
                 return null;
               },
             ),
@@ -310,8 +315,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
             onFieldSubmitted: isSignUp ? null : (_) => _handleSignIn(),
             validator: (v) {
               if (v == null || v.isEmpty) return 'Password is required';
-              if (isSignUp && v.length < 8)
+              if (isSignUp && v.length < 8) {
                 return 'Password must be at least 8 characters';
+              }
               return null;
             },
           ),
@@ -328,10 +334,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               autofillHints: const [AutofillHints.newPassword],
               onFieldSubmitted: (_) => _handleSignUp(),
               validator: (v) {
-                if (v == null || v.isEmpty)
+                if (v == null || v.isEmpty) {
                   return 'Please confirm your password';
-                if (v != _passwordController.text)
+                }
+                if (v != _passwordController.text) {
                   return 'Passwords do not match';
+                }
                 return null;
               },
             ),

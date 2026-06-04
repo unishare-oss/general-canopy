@@ -65,7 +65,7 @@ class _PhotoPane extends StatelessWidget {
             photo.url,
             height: 160,
             fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => Container(
+            errorBuilder: (_, _, _) => Container(
               height: 160,
               color: cs.surfaceContainerHighest,
               child: Icon(

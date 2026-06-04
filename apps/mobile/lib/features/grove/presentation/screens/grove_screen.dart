@@ -181,7 +181,7 @@ class _GroveContent extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
             sliver: SliverList.separated(
               itemCount: saplings.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 10),
+              separatorBuilder: (_, _) => const SizedBox(height: 10),
               itemBuilder: (context, i) => SaplingCard(
                 sapling: saplings[i],
                 onTap: () => context.go('/grove/sapling/${saplings[i].id}'),

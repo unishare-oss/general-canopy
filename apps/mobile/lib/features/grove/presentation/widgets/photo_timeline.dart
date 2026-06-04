@@ -36,7 +36,7 @@ class PhotoTimeline extends StatelessWidget {
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: photos.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 8),
+            separatorBuilder: (_, _) => const SizedBox(width: 8),
             itemBuilder: (context, index) {
               final photo = photos[index];
               return ClipRRect(
@@ -46,7 +46,7 @@ class PhotoTimeline extends StatelessWidget {
                   width: 120,
                   height: 120,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
+                  errorBuilder: (_, _, _) => Container(
                     width: 120,
                     height: 120,
                     color: cs.surfaceContainerHighest,

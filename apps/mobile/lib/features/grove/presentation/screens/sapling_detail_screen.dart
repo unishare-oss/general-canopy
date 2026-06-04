@@ -25,7 +25,7 @@ class SaplingDetailScreen extends ConsumerWidget {
       appBar: AppBar(leading: BackButton(onPressed: () => context.pop())),
       body: detailAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) =>
+        error: (_, _) =>
             const Center(child: Text('Could not load sapling details.')),
         data: (sapling) =>
             _DetailBody(sapling: sapling, uid: uid, adoptionId: adoptionId),
@@ -71,7 +71,7 @@ class _DetailBody extends ConsumerWidget {
                       (sapling.coverPhotoUrl ?? sapling.photoUrl)!,
                       fit: BoxFit.cover,
                       width: double.infinity,
-                      errorBuilder: (_, __, ___) => Center(
+                      errorBuilder: (_, _, _) => Center(
                         child: Icon(
                           Icons.park_rounded,
                           size: 80,
