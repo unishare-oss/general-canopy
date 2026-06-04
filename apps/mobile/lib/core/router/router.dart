@@ -114,8 +114,9 @@ GoRouter router(Ref ref) {
       // Top-level route so it can be pushed from any tab (Discover or Map).
       GoRoute(
         path: '/sapling/:id',
-        builder: (context, state) =>
-            discover.SaplingDetailScreen(saplingId: state.pathParameters['id']!),
+        builder: (context, state) => discover.SaplingDetailScreen(
+          saplingId: state.pathParameters['id']!,
+        ),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
