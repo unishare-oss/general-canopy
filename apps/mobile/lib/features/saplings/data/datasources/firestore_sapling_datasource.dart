@@ -54,8 +54,9 @@ class FirestoreSaplingDatasourceImpl implements FirestoreSaplingDatasource {
   @override
   Stream<(String id, SaplingModel model)> watchSaplingById(String id) =>
       _saplings.doc(id).snapshots().map((doc) {
-        if (!doc.exists || doc.data() == null)
+        if (!doc.exists || doc.data() == null) {
           throw SaplingNotFoundException(id);
+        }
         return (doc.id, SaplingModel.fromJson(doc.data()!));
       });
 
