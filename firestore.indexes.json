@@ -11,6 +11,21 @@
     {
       "collectionGroup": "activityFeed",
       "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "timestamp", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "adoptions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "co2OffsetKg", "order": "DESCENDING" },
+        { "fieldPath": "lastUpdated", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "activityFeed",
+      "queryScope": "COLLECTION",
       "fields": [{ "fieldPath": "timestamp", "order": "DESCENDING" }]
     },
     {
