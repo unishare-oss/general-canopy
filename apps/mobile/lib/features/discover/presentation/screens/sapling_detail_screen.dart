@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:canopy/features/saplings/domain/entities/sapling.dart';
 import 'package:canopy/features/saplings/domain/entities/sapling_exceptions.dart';
-import 'package:canopy/features/saplings/domain/usecases/get_sapling_by_id.dart';
+import 'package:canopy/features/saplings/domain/usecases/watch_sapling_by_id.dart';
 import 'package:canopy/features/saplings/domain/usecases/unadopt_sapling.dart';
 import 'package:canopy/features/saplings/presentation/providers/sapling_repository_provider.dart';
 import 'package:canopy/features/saplings/presentation/providers/discover_queue_provider.dart';
@@ -12,9 +12,9 @@ import 'package:canopy/features/auth/presentation/providers/guest_mode_provider.
 import 'package:canopy/features/discover/presentation/widgets/adopt_confirm_sheet.dart';
 import 'package:canopy/features/discover/presentation/widgets/adopt_confirmation_sheet.dart';
 
-// Provider for loading a sapling by ID (family provider — no codegen needed).
-final _saplingByIdProvider = FutureProvider.family<Sapling, String>(
-  (ref, id) => GetSaplingById(ref.watch(saplingRepositoryProvider))(id),
+// Live Firestore stream so the detail screen reflects adoption changes instantly.
+final _saplingByIdProvider = StreamProvider.family<Sapling, String>(
+  (ref, id) => WatchSaplingById(ref.watch(saplingRepositoryProvider))(id),
 );
 
 class SaplingDetailScreen extends ConsumerWidget {

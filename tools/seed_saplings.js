@@ -242,6 +242,7 @@ const SAPLINGS = [
     waterNeedLabel: 'Low', lightLabel: 'Full sun',
     wateringIntervalDays: 7,
     status: 'adopted', adoptedBy: 'seed-user-placeholder',
+    adoptedByName: 'Community Steward',
     photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Golden_shower_tree.jpg/960px-Golden_shower_tree.jpg',
   },
 ];

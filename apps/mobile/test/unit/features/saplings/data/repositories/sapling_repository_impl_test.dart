@@ -40,6 +40,10 @@ class _FakeDatasource implements FirestoreSaplingDatasource {
   }
 
   @override
+  Stream<(String, SaplingModel)> watchSaplingById(String id) =>
+      Stream.fromFuture(getSaplingById(id));
+
+  @override
   Future<void> adoptSapling({
     required String saplingId,
     required String uid,

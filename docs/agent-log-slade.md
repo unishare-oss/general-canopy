@@ -307,3 +307,12 @@ Summary:  1 file changed, 195 insertions(+), 26 deletions(-)
   [21:49] Edit: apps/mobile/lib/features/map/presentation/screens/map_screen.dart
   [21:49] Edit: apps/mobile/lib/features/map/presentation/screens/map_screen.dart
   [21:49] Edit: apps/mobile/lib/features/map/presentation/screens/map_screen.dart
+  [23:36] Edit: apps/mobile/lib/features/discover/presentation/screens/sapling_detail_screen.dart
+  [23:36] Edit: apps/mobile/lib/features/discover/presentation/screens/sapling_detail_screen.dart
+
+2026-06-04
+  [21:51] Edit: apps/mobile/lib/features/auth/presentation/screens/onboarding_screen.dart
+  [21:52] Edit: apps/mobile/lib/features/auth/presentation/screens/onboarding_screen.dart
+  [21:59] Edit: apps/mobile/lib/features/auth/presentation/providers/onboarding_provider.dart
+  [21:59] Edit: apps/mobile/lib/features/auth/presentation/providers/onboarding_provider.dart
+  [21:59] Edit: apps/mobile/lib/core/router/router.dart
