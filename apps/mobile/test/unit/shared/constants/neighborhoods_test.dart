@@ -11,6 +11,8 @@ void main() {
     test('contains Bangkok district strings', () {
       expect(kNeighborhoods, contains('Chatuchak'));
       expect(kNeighborhoods, contains('Silom'));
+      expect(kNeighborhoods, contains('Lat Phrao'));
+      expect(kNeighborhoods, contains('Ari'));
       expect(kNeighborhoods, contains('Thonglor'));
       expect(kNeighborhoods, contains('On Nut'));
     });
