@@ -112,7 +112,9 @@ void main() {
 
       expect(find.text('Welcome to Canopy.'), findsOneWidget);
       expect(
-        find.text('Adopt a tree on your block,\nkeep it alive, cool your city.'),
+        find.text(
+          'Adopt a tree on your block,\nkeep it alive, cool your city.',
+        ),
         findsOneWidget,
       );
       expect(find.widgetWithText(FilledButton, 'Get started'), findsOneWidget);
