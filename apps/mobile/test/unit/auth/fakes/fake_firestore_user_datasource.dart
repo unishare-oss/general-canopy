@@ -25,10 +25,15 @@ class FakeFirestoreUserDatasource extends FirestoreUserDatasource {
 
   // Captures from the last updateUserProfile call
   String? lastUpdateUid;
+  String? lastUpdateName;
   String? lastUpdateNeighborhood;
   CheckInFrequency? lastUpdateFrequency;
   PlantExperience? lastUpdateExperience;
+  NotificationPreferences? lastUpdateNotificationPreferences;
   bool? lastUpdateOnboardingComplete;
+
+  /// When set, the next updateUserProfile call throws this error.
+  Object? updateError;
 
   @override
   Future<AppUserModel?> getUser(String uid) async => storedUsers[uid];
@@ -61,17 +66,28 @@ class FakeFirestoreUserDatasource extends FirestoreUserDatasource {
   }) async {
     updateUserProfileCallCount++;
     lastUpdateUid = uid;
+    lastUpdateName = name;
     lastUpdateNeighborhood = neighborhood;
     lastUpdateFrequency = checkInFrequency;
     lastUpdateExperience = plantExperience;
+    lastUpdateNotificationPreferences = notificationPreferences;
     lastUpdateOnboardingComplete = onboardingComplete;
+
+    if (updateError != null) {
+      throw updateError!;
+    }
 
     final existing = storedUsers[uid];
     if (existing != null) {
       storedUsers[uid] = existing.copyWith(
+        name: name ?? existing.name,
         neighborhood: neighborhood ?? existing.neighborhood,
         checkInFrequency: checkInFrequency?.name ?? existing.checkInFrequency,
         plantExperience: plantExperience?.name ?? existing.plantExperience,
+        wateringReminders:
+            notificationPreferences?.wateringReminders ??
+            existing.wateringReminders,
+        cityAlerts: notificationPreferences?.cityAlerts ?? existing.cityAlerts,
         onboardingComplete: onboardingComplete ?? existing.onboardingComplete,
       );
     }
