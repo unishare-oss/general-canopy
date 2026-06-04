@@ -9,9 +9,11 @@ import 'package:canopy/features/auth/presentation/screens/onboarding_screen.dart
 import 'package:canopy/features/auth/presentation/screens/welcome_screen.dart';
 import 'package:canopy/core/router/shell_scaffold.dart';
 import 'package:canopy/features/discover/presentation/screens/discover_screen.dart';
-import 'package:canopy/features/discover/presentation/screens/sapling_detail_screen.dart';
+import 'package:canopy/features/discover/presentation/screens/sapling_detail_screen.dart'
+    as discover;
 import 'package:canopy/features/grove/presentation/screens/grove_screen.dart';
-import 'package:canopy/features/grove/presentation/screens/sapling_detail_screen.dart';
+import 'package:canopy/features/grove/presentation/screens/sapling_detail_screen.dart'
+    as grove;
 import 'package:canopy/features/map/presentation/screens/map_screen.dart';
 import 'package:canopy/features/impact/presentation/screens/impact_screen.dart';
 import 'package:canopy/features/you/presentation/screens/you_screen.dart';
@@ -113,7 +115,7 @@ GoRouter router(Ref ref) {
       GoRoute(
         path: '/sapling/:id',
         builder: (context, state) =>
-            SaplingDetailScreen(saplingId: state.pathParameters['id']!),
+            discover.SaplingDetailScreen(saplingId: state.pathParameters['id']!),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
@@ -140,7 +142,7 @@ GoRouter router(Ref ref) {
                 routes: [
                   GoRoute(
                     path: 'sapling/:id',
-                    builder: (c, s) => SaplingDetailScreen(
+                    builder: (c, s) => grove.SaplingDetailScreen(
                       adoptionId: s.pathParameters['id']!,
                     ),
                   ),
