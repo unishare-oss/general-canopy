@@ -63,7 +63,13 @@ class _RouterNotifier extends ChangeNotifier {
 
     // Case 2: Authenticated but onboarding not complete → /onboarding.
     // Guest users are exempt — they have no Firestore document.
-    if (isAuthenticated && user.onboardingComplete == false) {
+    // Also exempt if submit() just succeeded in-session: the Firestore write
+    // is done but authStateProvider hasn't re-emitted yet, so we trust the
+    // in-memory flag instead of bouncing the user back to /onboarding.
+    final didJustComplete = _ref.read(onboardingProvider).onboardingCompleted;
+    if (isAuthenticated &&
+        user.onboardingComplete == false &&
+        !didJustComplete) {
       return currentPath == '/onboarding' ? null : '/onboarding';
     }
 
