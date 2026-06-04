@@ -8,7 +8,7 @@ description: "Profile screen on the You tab: view/edit profile fields, notificat
 **Status:** REVIEW
 **Author:** bambi
 **Date:** 2026-06-04
-**Proposal:** [PROP-0002](../tech-proposals/0002-you-profile.md)
+**Proposal:** [PROP-0003](../tech-proposals/0003-you-profile.md)
 **Approved by:** (fill in when approved)
 
 ---
@@ -84,17 +84,24 @@ disables controls while `isSaving`.
 
 ## UX spec
 
+Layout follows the design mock (`Canopy/screenshots/04-04-fixed.png`,
+`Canopy/app/canopy-impact.jsx` → `YouScreen`): serif display title, profile
+card, uppercase micro section headers, and card-wrapped settings lists with
+values on the right. Stats triad and Forestry view from the mock depend on
+grove/impact/admin data and are out of scope here.
+
 - **Auth gate:** `authStateProvider.when` — loading → spinner; error → retry
   message; `user == null || user.isAnonymous || guestMode` → `GuestProfilePrompt`.
-- **Header:** `CircleAvatar` with `photoUrl` when present, else initials
-  derived from `name`; name + email below (read-only).
-- **Field rows:** Name, Neighborhood (`kNeighborhoods`), Check-in frequency
-  (`CheckInFrequency.values` labels), Plant experience
-  (`PlantExperience.values` labels). Tap → bottom sheet; null → "Not set".
-- **Notifications:** `SwitchListTile` × 2 (Watering reminders, City alerts);
-  toggling saves immediately via `NotificationPreferences.copyWith`.
-- **Sign out:** button → existing `confirmSignOut(context)` dialog → on
-  confirm, `signOutUseCaseProvider`; the router redirect handles navigation.
+- **Profile card:** `CircleAvatar` (photo or initials) left; serif name and
+  muted caption (`neighborhood · email`, or email alone) beside it.
+- **PREFERENCES card:** rows Name, Home neighborhood (`kNeighborhoods`),
+  Check-in frequency, Plant experience — label left, muted value + chevron
+  right. Tap → bottom sheet; null → "Not set".
+- **NOTIFICATIONS card:** `SwitchListTile` × 2 (Watering reminders, City
+  alerts); toggling saves immediately via `NotificationPreferences.copyWith`.
+- **ACCOUNT card:** Sign out row (error color) → existing
+  `confirmSignOut(context)` dialog → on confirm, `signOutUseCaseProvider`;
+  the router redirect handles navigation.
 - All colors via `ColorScheme` / `AppColors` extension, text via `textTheme`,
   package imports only.
 

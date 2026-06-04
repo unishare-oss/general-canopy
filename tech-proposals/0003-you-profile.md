@@ -1,9 +1,9 @@
 ---
-title: "0002: You Profile"
+title: "0003: You Profile"
 description: "Replace the You tab placeholder with a profile screen: view/edit profile and sign out."
 ---
 
-# PROP-0002: You Profile
+# PROP-0003: You Profile
 
 **Status:** PROPOSED
 **Author:** bambi

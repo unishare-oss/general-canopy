@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 import 'package:canopy/shared/theme/app_colors.dart';
 
-/// A tappable label/value row used for editable profile fields.
-/// Renders "Not set" in a muted color when [value] is null.
+/// A settings-list row matching the Canopy design mock: label on the left,
+/// muted value and chevron on the right. Renders "Not set" when [value] is
+/// null.
 class ProfileFieldRow extends StatelessWidget {
   const ProfileFieldRow({
     super.key,
@@ -21,19 +22,24 @@ class ProfileFieldRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tt = Theme.of(context).textTheme;
-    final cs = Theme.of(context).colorScheme;
     final ac = Theme.of(context).extension<AppColors>()!;
 
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 16),
       title: Text(label, style: tt.bodyLarge),
-      subtitle: Text(
-        value ?? 'Not set',
-        style: tt.bodyMedium?.copyWith(
-          color: value != null ? cs.onSurfaceVariant : ac.textSecondary,
-        ),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            value ?? 'Not set',
+            style: tt.bodySmall?.copyWith(
+              color: value != null ? ac.textSecondary : ac.muted,
+            ),
+          ),
+          const SizedBox(width: 4),
+          Icon(Icons.chevron_right, size: 18, color: ac.muted),
+        ],
       ),
-      trailing: Icon(Icons.chevron_right, color: cs.onSurfaceVariant),
       enabled: enabled,
       onTap: enabled ? onTap : null,
     );

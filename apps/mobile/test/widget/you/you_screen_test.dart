@@ -126,7 +126,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Test User'), findsWidgets);
-      expect(find.text('test@example.com'), findsOneWidget);
+      // Caption combines neighborhood and email per the design mock
+      expect(find.textContaining('test@example.com'), findsOneWidget);
       // Initials fallback (no photoUrl)
       expect(find.text('TU'), findsOneWidget);
     });
@@ -140,7 +141,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Name'), findsOneWidget);
-      expect(find.text('Neighborhood'), findsOneWidget);
+      expect(find.text('Home neighborhood'), findsOneWidget);
       expect(find.text('Ari'), findsOneWidget);
       expect(find.text('Check-in frequency'), findsOneWidget);
       expect(find.text(CheckInFrequency.onceAWeek.label), findsOneWidget);
@@ -185,11 +186,12 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.ensureVisible(find.text('Neighborhood'));
-      await tester.tap(find.text('Neighborhood'));
+      await tester.ensureVisible(find.text('Home neighborhood'));
+      await tester.tap(find.text('Home neighborhood'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Your neighborhood'), findsOneWidget);
+      // Sheet title duplicates the row label once the sheet is open
+      expect(find.text('Home neighborhood'), findsNWidgets(2));
       expect(find.text('Chatuchak'), findsOneWidget);
     });
 

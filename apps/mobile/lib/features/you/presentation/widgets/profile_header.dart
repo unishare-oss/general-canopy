@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:canopy/features/auth/domain/entities/app_user.dart';
 import 'package:canopy/shared/theme/app_colors.dart';
 
-/// Read-only profile header: avatar (photo or initials fallback),
-/// display name, and email.
+/// Profile card matching the Canopy design mock: avatar (photo or initials
+/// fallback) on the left, serif display name and muted caption beside it.
 class ProfileHeader extends StatelessWidget {
   const ProfileHeader({super.key, required this.user});
 
@@ -26,27 +26,48 @@ class ProfileHeader extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final ac = Theme.of(context).extension<AppColors>()!;
     final photoUrl = user.photoUrl;
+    final caption = user.neighborhood != null
+        ? '${user.neighborhood} · ${user.email}'
+        : user.email;
 
-    return Column(
-      children: [
-        CircleAvatar(
-          radius: 40,
-          backgroundColor: cs.primaryContainer,
-          foregroundImage: photoUrl != null ? NetworkImage(photoUrl) : null,
-          child: Text(
-            _initials,
-            style: tt.headlineSmall?.copyWith(color: cs.onPrimaryContainer),
-          ),
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 32,
+              backgroundColor: cs.primary,
+              foregroundImage: photoUrl != null ? NetworkImage(photoUrl) : null,
+              child: Text(
+                _initials,
+                style: tt.titleLarge?.copyWith(color: cs.onPrimary),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    user.name,
+                    style: tt.headlineSmall,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    caption,
+                    style: tt.bodySmall?.copyWith(color: ac.textSecondary),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 12),
-        Text(user.name, style: tt.titleLarge, textAlign: TextAlign.center),
-        const SizedBox(height: 2),
-        Text(
-          user.email,
-          style: tt.bodyMedium?.copyWith(color: ac.textSecondary),
-          textAlign: TextAlign.center,
-        ),
-      ],
+      ),
     );
   }
 }

@@ -44,7 +44,8 @@ class YouScreen extends ConsumerWidget {
     });
 
     return Scaffold(
-      appBar: AppBar(title: Text('You', style: tt.titleLarge)),
+      // Serif display title per the Canopy design mock.
+      appBar: AppBar(title: Text('You', style: tt.headlineMedium)),
       body: SafeArea(
         child: authAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),
@@ -119,7 +120,7 @@ class _ProfileContent extends ConsumerWidget {
   Future<void> _editNeighborhood(BuildContext context, WidgetRef ref) async {
     final neighborhood = await SelectOptionSheet.show<String>(
       context,
-      title: 'Your neighborhood',
+      title: 'Home neighborhood',
       selected: user.neighborhood,
       options: [
         for (final n in kNeighborhoods) SelectOption(value: n, label: n),
@@ -186,81 +187,118 @@ class _ProfileContent extends ConsumerWidget {
     final prefs = user.notificationPreferences;
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
       children: [
         ProfileHeader(user: user),
-        const SizedBox(height: 24),
-        Text(
-          'Profile',
-          style: tt.titleSmall?.copyWith(color: cs.onSurfaceVariant),
+        const _SectionHeader('Preferences'),
+        Card(
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            children: [
+              ProfileFieldRow(
+                label: 'Name',
+                value: user.name,
+                enabled: !isSaving,
+                onTap: () => _editName(context, ref),
+              ),
+              const Divider(height: 1),
+              ProfileFieldRow(
+                label: 'Home neighborhood',
+                value: user.neighborhood,
+                enabled: !isSaving,
+                onTap: () => _editNeighborhood(context, ref),
+              ),
+              const Divider(height: 1),
+              ProfileFieldRow(
+                label: 'Check-in frequency',
+                value: user.checkInFrequency?.label,
+                enabled: !isSaving,
+                onTap: () => _editFrequency(context, ref),
+              ),
+              const Divider(height: 1),
+              ProfileFieldRow(
+                label: 'Plant experience',
+                value: user.plantExperience?.label,
+                enabled: !isSaving,
+                onTap: () => _editExperience(context, ref),
+              ),
+            ],
+          ),
         ),
-        const SizedBox(height: 4),
-        ProfileFieldRow(
-          label: 'Name',
-          value: user.name,
-          enabled: !isSaving,
-          onTap: () => _editName(context, ref),
+        const _SectionHeader('Notifications'),
+        Card(
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            children: [
+              SwitchListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                title: Text('Watering reminders', style: tt.bodyLarge),
+                value: prefs.wateringReminders,
+                onChanged: isSaving
+                    ? null
+                    : (value) => ref
+                          .read(youProfileControllerProvider.notifier)
+                          .updateNotifications(
+                            user.id,
+                            prefs.copyWith(wateringReminders: value),
+                          ),
+              ),
+              const Divider(height: 1),
+              SwitchListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                title: Text('City alerts', style: tt.bodyLarge),
+                value: prefs.cityAlerts,
+                onChanged: isSaving
+                    ? null
+                    : (value) => ref
+                          .read(youProfileControllerProvider.notifier)
+                          .updateNotifications(
+                            user.id,
+                            prefs.copyWith(cityAlerts: value),
+                          ),
+              ),
+            ],
+          ),
         ),
-        ProfileFieldRow(
-          label: 'Neighborhood',
-          value: user.neighborhood,
-          enabled: !isSaving,
-          onTap: () => _editNeighborhood(context, ref),
-        ),
-        ProfileFieldRow(
-          label: 'Check-in frequency',
-          value: user.checkInFrequency?.label,
-          enabled: !isSaving,
-          onTap: () => _editFrequency(context, ref),
-        ),
-        ProfileFieldRow(
-          label: 'Plant experience',
-          value: user.plantExperience?.label,
-          enabled: !isSaving,
-          onTap: () => _editExperience(context, ref),
-        ),
-        const SizedBox(height: 24),
-        Text(
-          'Notifications',
-          style: tt.titleSmall?.copyWith(color: cs.onSurfaceVariant),
-        ),
-        const SizedBox(height: 4),
-        SwitchListTile(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-          title: Text('Watering reminders', style: tt.bodyLarge),
-          value: prefs.wateringReminders,
-          onChanged: isSaving
-              ? null
-              : (value) => ref
-                    .read(youProfileControllerProvider.notifier)
-                    .updateNotifications(
-                      user.id,
-                      prefs.copyWith(wateringReminders: value),
-                    ),
-        ),
-        SwitchListTile(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-          title: Text('City alerts', style: tt.bodyLarge),
-          value: prefs.cityAlerts,
-          onChanged: isSaving
-              ? null
-              : (value) => ref
-                    .read(youProfileControllerProvider.notifier)
-                    .updateNotifications(
-                      user.id,
-                      prefs.copyWith(cityAlerts: value),
-                    ),
-        ),
-        const SizedBox(height: 24),
-        OutlinedButton.icon(
-          onPressed: isSaving ? null : () => _signOut(context, ref),
-          icon: Icon(Icons.logout, color: cs.error),
-          label: Text(
-            'Sign out',
-            style: tt.bodyLarge?.copyWith(color: cs.error),
+        const _SectionHeader('Account'),
+        Card(
+          clipBehavior: Clip.antiAlias,
+          child: ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+            leading: Icon(Icons.logout, size: 20, color: cs.error),
+            title: Text(
+              'Sign out',
+              style: tt.bodyLarge?.copyWith(color: cs.error),
+            ),
+            enabled: !isSaving,
+            onTap: () => _signOut(context, ref),
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Uppercase micro section header per the Canopy design mock.
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader(this.title);
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    final tt = Theme.of(context).textTheme;
+    final ac = Theme.of(context).extension<AppColors>()!;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(4, 20, 4, 8),
+      child: Text(
+        title.toUpperCase(),
+        style: tt.labelSmall?.copyWith(
+          color: ac.textSecondary,
+          letterSpacing: 1.2,
+        ),
+      ),
     );
   }
 }
