@@ -59,6 +59,12 @@ class _FakeSaplingRepository implements SaplingRepository {
   }
 
   @override
+  Stream<Sapling> watchSaplingById(String id) {
+    if (throwNotFound) return Stream.error(Exception('Not found: $id'));
+    return Stream.value(_stub ?? _testSapling);
+  }
+
+  @override
   Future<void> adoptSapling({
     required String saplingId,
     required String uid,

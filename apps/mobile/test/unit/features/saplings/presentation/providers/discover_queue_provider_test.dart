@@ -26,6 +26,9 @@ class _FakeSaplingRepository implements SaplingRepository {
   Future<Sapling> getSaplingById(String id) => throw UnimplementedError();
 
   @override
+  Stream<Sapling> watchSaplingById(String id) => throw UnimplementedError();
+
+  @override
   Future<void> adoptSapling({
     required String saplingId,
     required String uid,

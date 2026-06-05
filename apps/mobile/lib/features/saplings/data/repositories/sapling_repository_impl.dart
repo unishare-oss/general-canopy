@@ -23,6 +23,10 @@ class SaplingRepositoryImpl implements SaplingRepository {
   }
 
   @override
+  Stream<Sapling> watchSaplingById(String id) =>
+      _datasource.watchSaplingById(id).map((r) => r.$2.toEntity(r.$1));
+
+  @override
   Future<void> adoptSapling({
     required String saplingId,
     required String uid,

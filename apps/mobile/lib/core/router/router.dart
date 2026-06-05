@@ -9,11 +9,17 @@ import 'package:canopy/features/auth/presentation/screens/onboarding_screen.dart
 import 'package:canopy/features/auth/presentation/screens/welcome_screen.dart';
 import 'package:canopy/core/router/shell_scaffold.dart';
 import 'package:canopy/features/discover/presentation/screens/discover_screen.dart';
-import 'package:canopy/features/discover/presentation/screens/sapling_detail_screen.dart';
+import 'package:canopy/features/discover/presentation/screens/sapling_detail_screen.dart'
+    as discover;
 import 'package:canopy/features/grove/presentation/screens/grove_screen.dart';
+import 'package:canopy/features/grove/presentation/screens/sapling_detail_screen.dart'
+    as grove;
 import 'package:canopy/features/map/presentation/screens/map_screen.dart';
 import 'package:canopy/features/impact/presentation/screens/impact_screen.dart';
 import 'package:canopy/features/you/presentation/screens/you_screen.dart';
+import 'package:canopy/features/discoveries/domain/entities/discovery.dart';
+import 'package:canopy/features/discoveries/presentation/screens/create_edit_discovery_screen.dart';
+import 'package:canopy/features/discoveries/presentation/screens/discovery_detail_screen.dart';
 
 part 'router.g.dart';
 
@@ -60,7 +66,13 @@ class _RouterNotifier extends ChangeNotifier {
 
     // Case 2: Authenticated but onboarding not complete → /onboarding.
     // Guest users are exempt — they have no Firestore document.
-    if (isAuthenticated && user.onboardingComplete == false) {
+    // Also exempt if submit() just succeeded in-session: the Firestore write
+    // is done but authStateProvider hasn't re-emitted yet, so we trust the
+    // in-memory flag instead of bouncing the user back to /onboarding.
+    final didJustComplete = _ref.read(onboardingProvider).onboardingCompleted;
+    if (isAuthenticated &&
+        user.onboardingComplete == false &&
+        !didJustComplete) {
       return currentPath == '/onboarding' ? null : '/onboarding';
     }
 
@@ -111,8 +123,24 @@ GoRouter router(Ref ref) {
       // Top-level route so it can be pushed from any tab (Discover or Map).
       GoRoute(
         path: '/sapling/:id',
-        builder: (context, state) =>
-            SaplingDetailScreen(saplingId: state.pathParameters['id']!),
+        builder: (context, state) => discover.SaplingDetailScreen(
+          saplingId: state.pathParameters['id']!,
+        ),
+      ),
+      // Discovery routes — create must be listed before :id to avoid collision.
+      GoRoute(
+        path: '/discovery/create',
+        builder: (c, s) => const CreateEditDiscoveryScreen(),
+      ),
+      GoRoute(
+        path: '/discovery/:id/edit',
+        builder: (c, s) =>
+            CreateEditDiscoveryScreen(discovery: s.extra as Discovery?),
+      ),
+      GoRoute(
+        path: '/discovery/:id',
+        builder: (c, s) =>
+            DiscoveryDetailScreen(discoveryId: s.pathParameters['id']!),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
@@ -133,7 +161,18 @@ GoRouter router(Ref ref) {
           ),
           StatefulShellBranch(
             routes: [
-              GoRoute(path: '/grove', builder: (c, s) => const GroveScreen()),
+              GoRoute(
+                path: '/grove',
+                builder: (c, s) => const GroveScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'sapling/:id',
+                    builder: (c, s) => grove.SaplingDetailScreen(
+                      adoptionId: s.pathParameters['id']!,
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
           StatefulShellBranch(

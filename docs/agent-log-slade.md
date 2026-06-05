@@ -307,3 +307,29 @@ Summary:  1 file changed, 195 insertions(+), 26 deletions(-)
   [21:49] Edit: apps/mobile/lib/features/map/presentation/screens/map_screen.dart
   [21:49] Edit: apps/mobile/lib/features/map/presentation/screens/map_screen.dart
   [21:49] Edit: apps/mobile/lib/features/map/presentation/screens/map_screen.dart
+  [23:36] Edit: apps/mobile/lib/features/discover/presentation/screens/sapling_detail_screen.dart
+  [23:36] Edit: apps/mobile/lib/features/discover/presentation/screens/sapling_detail_screen.dart
+
+2026-06-04
+  [21:51] Edit: apps/mobile/lib/features/auth/presentation/screens/onboarding_screen.dart
+  [21:52] Edit: apps/mobile/lib/features/auth/presentation/screens/onboarding_screen.dart
+  [21:59] Edit: apps/mobile/lib/features/auth/presentation/providers/onboarding_provider.dart
+  [21:59] Edit: apps/mobile/lib/features/auth/presentation/providers/onboarding_provider.dart
+  [21:59] Edit: apps/mobile/lib/core/router/router.dart
+  [22:43] Edit: apps/mobile/lib/features/grove/presentation/providers/grove_providers.dart
+Files:
+  ~ apps/mobile/lib/core/router/router.dart
+  ~ apps/mobile/lib/features/discoveries/data/repositories/discovery_repository_impl.dart
+  ~ apps/mobile/lib/features/discoveries/presentation/screens/create_edit_discovery_screen.dart
+  ~ apps/mobile/lib/features/discoveries/presentation/screens/discovery_detail_screen.dart
+  ~ apps/mobile/lib/features/map/presentation/screens/map_screen.dart
+Summary:  5 files changed, 18 insertions(+), 33 deletions(-)
+
+Files:
+  ~ apps/mobile/lib/core/router/router.dart
+  ~ apps/mobile/lib/features/discoveries/data/repositories/discovery_repository_impl.dart
+  ~ apps/mobile/lib/features/discoveries/presentation/screens/create_edit_discovery_screen.dart
+  ~ apps/mobile/lib/features/discoveries/presentation/screens/discovery_detail_screen.dart
+  ~ apps/mobile/lib/features/map/presentation/screens/map_screen.dart
+Summary:  5 files changed, 18 insertions(+), 33 deletions(-)
+

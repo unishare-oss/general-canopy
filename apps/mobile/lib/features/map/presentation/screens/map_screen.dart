@@ -1,10 +1,18 @@
+import 'dart:async';
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_location_marker/flutter_map_location_marker.dart'
+    hide PermissionDeniedException;
+import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:go_router/go_router.dart';
+import 'package:canopy/features/admin/presentation/providers/is_admin_provider.dart';
+import 'package:canopy/features/discoveries/domain/entities/discovery.dart';
+import 'package:canopy/features/discoveries/presentation/providers/watch_all_discoveries_provider.dart';
 import 'package:canopy/features/saplings/domain/entities/sapling.dart';
 import 'package:canopy/features/saplings/presentation/providers/available_saplings_provider.dart';
 
@@ -23,16 +31,94 @@ class MapScreen extends ConsumerWidget {
   }
 }
 
-class _SaplingMap extends StatelessWidget {
+class _SaplingMap extends ConsumerStatefulWidget {
   const _SaplingMap({required this.saplings});
-
   final List<Sapling> saplings;
+
+  @override
+  ConsumerState<_SaplingMap> createState() => _SaplingMapState();
+}
+
+class _SaplingMapState extends ConsumerState<_SaplingMap> {
+  final _mapController = MapController();
+  bool _showLocation = false;
+  AlignOnUpdate _followMode = AlignOnUpdate.never;
+
+  @override
+  void dispose() {
+    _mapController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _onLocationPressed() async {
+    try {
+      // On native platforms check permissions explicitly first.
+      // On web the browser handles the permission prompt inside getCurrentPosition.
+      if (!kIsWeb) {
+        final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+        if (!serviceEnabled) {
+          _showSnack('Please enable location services.');
+          return;
+        }
+
+        var permission = await Geolocator.checkPermission();
+        if (permission == LocationPermission.denied) {
+          permission = await Geolocator.requestPermission();
+        }
+        if (permission == LocationPermission.denied ||
+            permission == LocationPermission.deniedForever) {
+          _showSnack('Location permission is required.');
+          return;
+        }
+      }
+
+      // medium accuracy resolves faster than high on both device and simulator
+      final pos = await Geolocator.getCurrentPosition(
+        locationSettings:
+            const LocationSettings(accuracy: LocationAccuracy.medium),
+      ).timeout(const Duration(seconds: 20));
+
+      if (!mounted) return;
+      final zoom = _mapController.camera.zoom;
+      _mapController.move(
+        LatLng(pos.latitude, pos.longitude),
+        zoom < 14 ? 15 : zoom,
+      );
+      setState(() {
+        _showLocation = true;
+        _followMode = AlignOnUpdate.always;
+      });
+    } on PermissionDeniedException {
+      _showSnack('Location permission denied.');
+    } on LocationServiceDisabledException {
+      _showSnack('Please enable location services.');
+    } on TimeoutException {
+      _showSnack('Location request timed out. Try again.');
+    } catch (e) {
+      _showSnack('Could not get location: $e');
+    }
+  }
+
+  void _showSnack(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+  }
 
   @override
   Widget build(BuildContext context) {
     const defaultCenter = LatLng(13.7563, 100.5018);
 
-    final markers = saplings.map((s) {
+    final discoveriesAsync = ref.watch(watchAllDiscoveriesProvider);
+    final isAdmin = ref.watch(isAdminProvider).value ?? false;
+
+    final discoveries = discoveriesAsync.when(
+      data: (d) => d,
+      loading: () => <Discovery>[],
+      error: (_, _) => <Discovery>[],
+    );
+
+    final saplingMarkers = widget.saplings.map((s) {
       final color = Color(int.parse('0xFF${s.colorHex.replaceFirst('#', '')}'));
       final isAdopted = !s.isAvailable;
       final markerWidth = isAdopted ? 88.0 : 42.0;
@@ -54,23 +140,138 @@ class _SaplingMap extends StatelessWidget {
       );
     }).toList();
 
+    final discoveryMarkers = discoveries.map((d) {
+      final color = Color(int.parse('0xFF${d.colorHex.replaceFirst('#', '')}'));
+      return Marker(
+        point: LatLng(d.lat, d.lng),
+        width: 40,
+        height: 40,
+        alignment: Alignment.center,
+        child: GestureDetector(
+          onTap: () => context.push('/discovery/${d.id}'),
+          child: Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white, width: 2),
+              boxShadow: [
+                BoxShadow(
+                  color: color.withValues(alpha: 0.45),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: const Icon(Icons.place, size: 20, color: Colors.white),
+          ),
+        ),
+      );
+    }).toList();
+
     return Stack(
       children: [
         FlutterMap(
-          options: const MapOptions(
+          mapController: _mapController,
+          options: MapOptions(
             initialCenter: defaultCenter,
             initialZoom: 13,
+            onMapEvent: (event) {
+              if (_followMode == AlignOnUpdate.always &&
+                  event is MapEventMove &&
+                  event.source != MapEventSource.mapController) {
+                setState(() => _followMode = AlignOnUpdate.never);
+              }
+            },
           ),
           children: [
             TileLayer(
               urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
               userAgentPackageName: 'com.canopy.app',
             ),
-            MarkerLayer(markers: markers),
+            if (_showLocation)
+              CurrentLocationLayer(
+                alignPositionOnUpdate: _followMode,
+                alignPositionAnimationCurve: Curves.easeInOut,
+                alignPositionAnimationDuration:
+                    const Duration(milliseconds: 400),
+                style: LocationMarkerStyle(
+                  markerSize: const Size(22, 22),
+                  accuracyCircleColor: Colors.blue.withValues(alpha: 0.1),
+                  headingSectorColor: Colors.blue.withValues(alpha: 0.4),
+                ),
+              ),
+            MarkerLayer(markers: saplingMarkers),
+            MarkerLayer(markers: discoveryMarkers),
           ],
         ),
         Positioned(top: 12, right: 12, child: _LegendButton()),
+        Positioned(
+          bottom: 16,
+          right: 16,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (isAdmin) ...[
+                FloatingActionButton(
+                  heroTag: 'addDiscovery',
+                  onPressed: () => context.push('/discovery/create'),
+                  child: const Icon(Icons.add),
+                ),
+                const SizedBox(height: 8),
+              ],
+              _LocationFAB(
+                showLocation: _showLocation,
+                isFollowing: _followMode == AlignOnUpdate.always,
+                onPressed: _onLocationPressed,
+              ),
+            ],
+          ),
+        ),
       ],
+    );
+  }
+}
+
+class _LocationFAB extends StatelessWidget {
+  const _LocationFAB({
+    required this.showLocation,
+    required this.isFollowing,
+    required this.onPressed,
+  });
+
+  final bool showLocation;
+  final bool isFollowing;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final IconData icon;
+    final Color iconColor;
+    final Color bgColor;
+
+    if (!showLocation) {
+      icon = Icons.my_location;
+      iconColor = cs.onSurface;
+      bgColor = cs.surface;
+    } else if (isFollowing) {
+      icon = Icons.my_location;
+      iconColor = Colors.white;
+      bgColor = cs.primary;
+    } else {
+      icon = Icons.location_searching;
+      iconColor = cs.primary;
+      bgColor = cs.surface;
+    }
+
+    return FloatingActionButton.small(
+      heroTag: 'locationFAB',
+      backgroundColor: bgColor,
+      elevation: 4,
+      onPressed: onPressed,
+      child: Icon(icon, color: iconColor, size: 20),
     );
   }
 }
@@ -123,13 +324,22 @@ class _LegendButton extends StatelessWidget {
                 color: cs.primary,
                 label: 'Available',
                 description: 'This sapling is waiting to be adopted.',
+                showPin: true,
               ),
               const SizedBox(height: 12),
               _LegendRow(
-                icon: Icons.favorite,
+                icon: Icons.person,
                 color: cs.tertiary,
                 label: 'Adopted',
                 description: 'A community member is caring for this tree.',
+                showPin: true,
+              ),
+              const SizedBox(height: 12),
+              _LegendRow(
+                icon: Icons.place,
+                color: cs.secondary,
+                label: 'Discovery',
+                description: 'A point of interest in the urban forest.',
               ),
             ],
           ),
@@ -145,34 +355,49 @@ class _LegendRow extends StatelessWidget {
     required this.color,
     required this.label,
     required this.description,
+    this.showPin = false,
   });
 
   final IconData icon;
   final Color color;
   final String label;
   final String description;
+  final bool showPin;
 
   @override
   Widget build(BuildContext context) {
     final tt = Theme.of(context).textTheme;
     return Row(
       children: [
-        Container(
+        SizedBox(
           width: 36,
-          height: 36,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 2),
-            boxShadow: [
-              BoxShadow(
-                color: color.withValues(alpha: 0.35),
-                blurRadius: 6,
-                offset: const Offset(0, 2),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: color,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: color.withValues(alpha: 0.35),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Icon(icon, size: 18, color: Colors.white),
               ),
+              if (showPin)
+                CustomPaint(
+                  size: const Size(10, 7),
+                  painter: _PinTailPainter(color: color),
+                ),
             ],
           ),
-          child: Icon(icon, size: 18, color: Colors.white),
         ),
         const SizedBox(width: 16),
         Expanded(

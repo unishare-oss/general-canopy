@@ -14,6 +14,7 @@ class OnboardingState {
     this.selectedExperience,
     this.isSubmitting = false,
     this.submitError,
+    this.onboardingCompleted = false,
   });
 
   final int currentStep;
@@ -22,6 +23,9 @@ class OnboardingState {
   final PlantExperience? selectedExperience;
   final bool isSubmitting;
   final String? submitError;
+  // True once submit() succeeds. The router reads this to bypass the
+  // onboardingComplete==false redirect before authStateProvider re-emits.
+  final bool onboardingCompleted;
 
   OnboardingState copyWith({
     int? currentStep,
@@ -34,6 +38,7 @@ class OnboardingState {
     bool? isSubmitting,
     String? submitError,
     bool clearSubmitError = false,
+    bool? onboardingCompleted,
   }) => OnboardingState(
     currentStep: currentStep ?? this.currentStep,
     selectedNeighborhood: clearNeighborhood
@@ -47,6 +52,7 @@ class OnboardingState {
         : selectedExperience ?? this.selectedExperience,
     isSubmitting: isSubmitting ?? this.isSubmitting,
     submitError: clearSubmitError ? null : submitError ?? this.submitError,
+    onboardingCompleted: onboardingCompleted ?? this.onboardingCompleted,
   );
 }
 
@@ -84,7 +90,7 @@ class OnboardingNotifier extends _$OnboardingNotifier {
         plantExperience: state.selectedExperience,
         onboardingComplete: true,
       );
-      state = state.copyWith(isSubmitting: false);
+      state = state.copyWith(isSubmitting: false, onboardingCompleted: true);
     } catch (_) {
       state = state.copyWith(
         isSubmitting: false,

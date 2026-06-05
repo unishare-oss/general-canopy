@@ -58,10 +58,13 @@ dependencies:
   # Map
   flutter_map: ^7.0.0
   latlong2: ^0.9.1
+  geolocator: ^13.0.0
+  flutter_map_location_marker: ^9.1.1
 
   # UI
   google_fonts: ^8.1.0
   flutter_svg: ^2.3.0
+  share_plus: ^10.0.0
   flutter_web_plugins:
     sdk: flutter
   image_picker: ^1.2.2

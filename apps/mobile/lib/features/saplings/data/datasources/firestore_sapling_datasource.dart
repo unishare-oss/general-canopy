@@ -6,6 +6,7 @@ abstract interface class FirestoreSaplingDatasource {
   Stream<List<(String id, SaplingModel model)>> watchAvailableSaplings();
   Stream<List<(String id, SaplingModel model)>> watchAllSaplings();
   Future<(String id, SaplingModel model)> getSaplingById(String id);
+  Stream<(String id, SaplingModel model)> watchSaplingById(String id);
   Future<void> adoptSapling({
     required String saplingId,
     required String uid,
@@ -51,6 +52,40 @@ class FirestoreSaplingDatasourceImpl implements FirestoreSaplingDatasource {
   }
 
   @override
+  Stream<(String id, SaplingModel model)> watchSaplingById(String id) =>
+      _saplings.doc(id).snapshots().map((doc) {
+        if (!doc.exists || doc.data() == null) {
+          throw SaplingNotFoundException(id);
+        }
+        return (doc.id, SaplingModel.fromJson(doc.data()!));
+      });
+
+  DocumentReference<Map<String, dynamic>> _adoptionRef(
+    String uid,
+    String saplingId,
+  ) => _firestore
+      .collection('users')
+      .doc(uid)
+      .collection('adoptions')
+      .doc(saplingId);
+
+  DocumentReference<Map<String, dynamic>> _saplingAdoptionRef(
+    String uid,
+    String saplingId,
+  ) => _firestore
+      .collection('users')
+      .doc(uid)
+      .collection('saplingAdoptions')
+      .doc(saplingId);
+
+  DocumentReference<Map<String, dynamic>> _impactSummaryRef(String uid) =>
+      _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('impactSummary')
+          .doc('current');
+
+  @override
   Future<void> adoptSapling({
     required String saplingId,
     required String uid,
@@ -63,6 +98,9 @@ class FirestoreSaplingDatasourceImpl implements FirestoreSaplingDatasource {
       if (!snapshot.exists || snapshot.data()?['status'] != 'available') {
         throw const SaplingAlreadyAdoptedException();
       }
+      final data = snapshot.data()!;
+      final wateringInterval = (data['wateringIntervalDays'] as int?) ?? 3;
+
       txn.update(ref, {
         'status': 'adopted',
         'adoptedBy': uid,
@@ -71,6 +109,38 @@ class FirestoreSaplingDatasourceImpl implements FirestoreSaplingDatasource {
         if (photoUrl != null) 'adoptedByPhotoUrl': photoUrl,
         'adoptedAt': FieldValue.serverTimestamp(),
       });
+
+      txn.set(_adoptionRef(uid, saplingId), {
+        'saplingId': saplingId,
+        'nickname': data['nickname'],
+        'species': data['species'],
+        'street': data['street'] ?? '',
+        'neighborhood': data['neighborhood'],
+        'colorHex': data['color'],
+        'photoUrl': data['photoUrl'],
+        'coverPhotoUrl': data['photoUrl'],
+        'adoptedAt': FieldValue.serverTimestamp(),
+        'healthScore': 80,
+        'nextActionAt': Timestamp.fromDate(
+          DateTime.now().add(Duration(days: wateringInterval)),
+        ),
+        'nextActionType': 'water',
+      });
+
+      txn.set(_saplingAdoptionRef(uid, saplingId), {
+        'saplingId': saplingId,
+        'nickname': data['nickname'],
+        'streakDays': 0,
+        'lastCheckIn': null,
+        'adoptedAt': FieldValue.serverTimestamp(),
+        'wateringIntervalDays': wateringInterval,
+      });
+
+      txn.set(
+        _impactSummaryRef(uid),
+        {'adoptedCount': FieldValue.increment(1)},
+        SetOptions(merge: true),
+      );
     });
   }
 
@@ -95,6 +165,13 @@ class FirestoreSaplingDatasourceImpl implements FirestoreSaplingDatasource {
         'adoptedByPhotoUrl': FieldValue.delete(),
         'adoptedAt': FieldValue.delete(),
       });
+      txn.delete(_adoptionRef(uid, saplingId));
+      txn.delete(_saplingAdoptionRef(uid, saplingId));
+      txn.set(
+        _impactSummaryRef(uid),
+        {'adoptedCount': FieldValue.increment(-1)},
+        SetOptions(merge: true),
+      );
     });
   }
 }
