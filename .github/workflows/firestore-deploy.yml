@@ -1,4 +1,4 @@
-name: Deploy Firestore
+name: Deploy Firestore & Storage
 
 on:
   push:
@@ -6,13 +6,20 @@ on:
     paths:
       - 'firestore.rules'
       - 'firestore.indexes.json'
+      - 'storage.rules'
+      - 'firebase.json'
+      - '.github/workflows/firestore-deploy.yml'
 
 permissions:
   contents: read
 
+concurrency:
+  group: deploy-firestore-storage
+  cancel-in-progress: false
+
 jobs:
   deploy:
-    name: Deploy Rules & Indexes
+    name: Deploy Rules, Indexes & Storage
     runs-on: ubuntu-latest
 
     steps:
@@ -25,5 +32,5 @@ jobs:
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
 
-      - name: Deploy Firestore rules and indexes
-        run: firebase deploy --only firestore --project canopy-30d09
+      - name: Deploy Firestore & Storage rules and indexes
+        run: firebase deploy --only firestore,storage --project canopy-30d09
