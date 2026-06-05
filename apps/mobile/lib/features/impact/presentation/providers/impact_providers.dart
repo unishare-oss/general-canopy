@@ -75,20 +75,20 @@ final activityFeedProvider = StreamProvider.autoDispose<List<ActivityItem>>((
 final effectiveImpactSummaryProvider = Provider.autoDispose<ImpactSummary>((
   ref,
 ) {
-  final summary = ref.watch(impactSummaryProvider).maybeWhen(
-    data: (s) => s,
-    orElse: ImpactSummary.zero,
-  );
-  final streakCount = ref.watch(saplingStreaksProvider).maybeWhen(
-    data: (s) => s.length,
-    orElse: () => 0,
-  );
-  final groveCount = ref.watch(myGroveProvider).maybeWhen(
-    data: (s) => s.length,
-    orElse: () => 0,
-  );
-  final count = [summary.adoptedCount, streakCount, groveCount]
-      .fold(0, (a, b) => a > b ? a : b);
+  final summary = ref
+      .watch(impactSummaryProvider)
+      .maybeWhen(data: (s) => s, orElse: ImpactSummary.zero);
+  final streakCount = ref
+      .watch(saplingStreaksProvider)
+      .maybeWhen(data: (s) => s.length, orElse: () => 0);
+  final groveCount = ref
+      .watch(myGroveProvider)
+      .maybeWhen(data: (s) => s.length, orElse: () => 0);
+  final count = [
+    summary.adoptedCount,
+    streakCount,
+    groveCount,
+  ].fold(0, (a, b) => a > b ? a : b);
   if (count == summary.adoptedCount) return summary;
   return ImpactSummary(
     co2OffsetKg: summary.co2OffsetKg,

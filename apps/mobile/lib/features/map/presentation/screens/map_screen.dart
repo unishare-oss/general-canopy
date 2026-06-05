@@ -74,8 +74,9 @@ class _SaplingMapState extends ConsumerState<_SaplingMap> {
 
       // medium accuracy resolves faster than high on both device and simulator
       final pos = await Geolocator.getCurrentPosition(
-        locationSettings:
-            const LocationSettings(accuracy: LocationAccuracy.medium),
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.medium,
+        ),
       ).timeout(const Duration(seconds: 20));
 
       if (!mounted) return;
@@ -101,8 +102,9 @@ class _SaplingMapState extends ConsumerState<_SaplingMap> {
 
   void _showSnack(String message) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -194,8 +196,9 @@ class _SaplingMapState extends ConsumerState<_SaplingMap> {
               CurrentLocationLayer(
                 alignPositionOnUpdate: _followMode,
                 alignPositionAnimationCurve: Curves.easeInOut,
-                alignPositionAnimationDuration:
-                    const Duration(milliseconds: 400),
+                alignPositionAnimationDuration: const Duration(
+                  milliseconds: 400,
+                ),
                 style: LocationMarkerStyle(
                   markerSize: const Size(22, 22),
                   accuracyCircleColor: Colors.blue.withValues(alpha: 0.1),
