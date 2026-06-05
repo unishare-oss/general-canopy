@@ -11,6 +11,7 @@ class UpdateUserProfile {
   Future<void> call({
     required String uid,
     String? name,
+    String? avatarBase64,
     String? neighborhood,
     CheckInFrequency? checkInFrequency,
     PlantExperience? plantExperience,
@@ -19,6 +20,7 @@ class UpdateUserProfile {
   }) => _repository.updateUserProfile(
     uid: uid,
     name: name,
+    avatarBase64: avatarBase64,
     neighborhood: neighborhood,
     checkInFrequency: checkInFrequency,
     plantExperience: plantExperience,

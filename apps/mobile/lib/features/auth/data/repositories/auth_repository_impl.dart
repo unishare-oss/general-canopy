@@ -170,6 +170,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> updateUserProfile({
     required String uid,
     String? name,
+    String? avatarBase64,
     String? neighborhood,
     CheckInFrequency? checkInFrequency,
     PlantExperience? plantExperience,
@@ -178,6 +179,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }) => _firestore.updateUserProfile(
     uid: uid,
     name: name,
+    avatarBase64: avatarBase64,
     neighborhood: neighborhood,
     checkInFrequency: checkInFrequency,
     plantExperience: plantExperience,

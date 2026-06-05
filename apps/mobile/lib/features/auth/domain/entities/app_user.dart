@@ -8,6 +8,7 @@ class AppUser {
     required this.name,
     required this.email,
     this.photoUrl,
+    this.avatarBase64,
     this.neighborhood,
     this.checkInFrequency,
     this.plantExperience,
@@ -22,6 +23,10 @@ class AppUser {
   final String name;
   final String email;
   final String? photoUrl;
+
+  /// User-uploaded avatar stored as a base64-encoded JPEG (~256px).
+  /// Takes precedence over [photoUrl] when set.
+  final String? avatarBase64;
 
   /// Canopy-specific profile fields.
   final String? neighborhood;

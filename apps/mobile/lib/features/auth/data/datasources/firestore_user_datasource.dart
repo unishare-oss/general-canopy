@@ -43,6 +43,7 @@ class FirestoreUserDatasource {
   Future<void> updateUserProfile({
     required String uid,
     String? name,
+    String? avatarBase64,
     String? neighborhood,
     CheckInFrequency? checkInFrequency,
     PlantExperience? plantExperience,
@@ -51,6 +52,7 @@ class FirestoreUserDatasource {
   }) async {
     final data = <String, dynamic>{};
     if (name != null) data['name'] = name;
+    if (avatarBase64 != null) data['avatarBase64'] = avatarBase64;
     if (neighborhood != null) data['neighborhood'] = neighborhood;
     if (checkInFrequency != null) {
       data['checkInFrequency'] = checkInFrequency.name;

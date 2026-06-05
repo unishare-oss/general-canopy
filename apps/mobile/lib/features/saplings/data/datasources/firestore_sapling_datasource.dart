@@ -143,11 +143,9 @@ class FirestoreSaplingDatasourceImpl implements FirestoreSaplingDatasource {
         'wateringIntervalDays': wateringInterval,
       });
 
-      txn.set(
-        _impactSummaryRef(uid),
-        {'adoptedCount': FieldValue.increment(1)},
-        SetOptions(merge: true),
-      );
+      txn.set(_impactSummaryRef(uid), {
+        'adoptedCount': FieldValue.increment(1),
+      }, SetOptions(merge: true));
     });
   }
 
@@ -174,11 +172,9 @@ class FirestoreSaplingDatasourceImpl implements FirestoreSaplingDatasource {
       });
       txn.delete(_adoptionRef(uid, saplingId));
       txn.delete(_saplingAdoptionRef(uid, saplingId));
-      txn.set(
-        _impactSummaryRef(uid),
-        {'adoptedCount': FieldValue.increment(-1)},
-        SetOptions(merge: true),
-      );
+      txn.set(_impactSummaryRef(uid), {
+        'adoptedCount': FieldValue.increment(-1),
+      }, SetOptions(merge: true));
     });
   }
 }

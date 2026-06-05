@@ -359,9 +359,7 @@ class _TodayCard extends StatelessWidget {
                           : saplings.isEmpty
                           ? 'Head to Discover to adopt your first tree.'
                           : 'Next check-in scheduled soon.',
-                      style: tt.bodySmall?.copyWith(
-                        color: cs.onSurfaceVariant,
-                      ),
+                      style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
                     ),
                   ],
                 ),

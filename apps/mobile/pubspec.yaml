@@ -71,6 +71,9 @@ dependencies:
   share_plus: ^10.0.0
   flutter_web_plugins:
     sdk: flutter
+  image_picker: ^1.2.2
+  image: ^4.9.1
+  web: ^1.1.1
 
 
 dev_dependencies:
