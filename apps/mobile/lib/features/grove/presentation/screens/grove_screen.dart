@@ -98,9 +98,6 @@ class _GroveContent extends StatelessWidget {
     return DateTime.now().difference(earliest.adoptedAt).inDays;
   }
 
-  int get _totalCount =>
-      saplings.isNotEmpty ? saplings.length : adoptedSaplings.length;
-
   @override
   Widget build(BuildContext context) {
     final tt = Theme.of(context).textTheme;
@@ -270,21 +267,6 @@ class _GroveContent extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
-          )
-        else
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-            sliver: SliverList.separated(
-              itemCount: adoptedSaplings.length,
-              separatorBuilder: (_, _) => const SizedBox(height: 10),
-              itemBuilder: (context, i) {
-                final s = adoptedSaplings[i];
-                return _AdoptedSaplingCard(
-                  sapling: s,
-                  onTap: () => context.go('/sapling/${s.id}'),
-                );
-              },
             ),
           ),
           SliverToBoxAdapter(child: _OnYourBlock(saplings: availableSaplings)),
