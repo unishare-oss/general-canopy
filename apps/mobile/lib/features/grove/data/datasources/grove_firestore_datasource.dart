@@ -86,12 +86,16 @@ class GroveFirestoreDatasource {
       final adoptionSnap = await txn.get(adoptionRef);
       final currentHealth = (adoptionSnap.data()?['healthScore'] as int?) ?? 80;
       final newHealth = (currentHealth + 5).clamp(0, 100);
+      // Actual gain after clamping (e.g. 0 when already at 100), so the care
+      // history shows the true health change rather than a flat +5.
+      final healthScoreDelta = newHealth - currentHealth;
       final nextActionAt = DateTime.now().add(const Duration(days: 3));
 
       // 1. Write care history entry
       txn.set(historyRef, {
         'type': typeString,
         'performedAt': FieldValue.serverTimestamp(),
+        'healthScoreDelta': healthScoreDelta,
       });
 
       // 2. Update adoption health + next action
