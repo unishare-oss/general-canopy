@@ -9,6 +9,20 @@ import 'package:canopy/features/saplings/domain/usecases/get_sapling_by_id.dart'
 // ---------------------------------------------------------------------------
 
 class _FakeSaplingRepository implements SaplingRepository {
+  @override
+  Future<String> createSapling({
+    required String nickname,
+    required String species,
+    required String latin,
+    required String personality,
+    required String street,
+    required String neighborhood,
+    required double lat,
+    required double lng,
+    required String colorHex,
+    String? photoUrl,
+  }) => throw UnimplementedError();
+
   String? capturedId;
   final Sapling? _stubResult;
 

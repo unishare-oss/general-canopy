@@ -12,6 +12,20 @@ import 'package:canopy/features/saplings/presentation/providers/sapling_reposito
 // ---------------------------------------------------------------------------
 
 class _FakeSaplingRepository implements SaplingRepository {
+  @override
+  Future<String> createSapling({
+    required String nickname,
+    required String species,
+    required String latin,
+    required String personality,
+    required String street,
+    required String neighborhood,
+    required double lat,
+    required double lng,
+    required String colorHex,
+    String? photoUrl,
+  }) => throw UnimplementedError();
+
   bool throwOnAdopt = false;
   bool throwAlreadyAdopted = false;
   String? adoptedSaplingId;

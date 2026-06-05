@@ -28,6 +28,20 @@ const _authenticatedUser = AppUser(
 
 class _NoopSaplingRepository implements SaplingRepository {
   @override
+  Future<String> createSapling({
+    required String nickname,
+    required String species,
+    required String latin,
+    required String personality,
+    required String street,
+    required String neighborhood,
+    required double lat,
+    required double lng,
+    required String colorHex,
+    String? photoUrl,
+  }) => throw UnimplementedError();
+
+  @override
   Stream<List<Sapling>> getAvailableSaplings() => Stream.value([]);
 
   @override
