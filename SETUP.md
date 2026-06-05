@@ -128,6 +128,43 @@ Firebase config from repository **secrets** — add these in your GitHub repo
 - `GOOGLE_SERVICE_INFO_PLIST` — contents of `ios/Runner/GoogleService-Info.plist`
 - `CODECOV_TOKEN` — optional, for coverage upload
 
+### Deploy secret (`firestore-deploy.yml`)
+
+`firestore-deploy.yml` deploys Firestore **and** Storage rules/indexes on
+pushes to `main`. It authenticates with a Google Cloud service-account key:
+
+- `FIREBASE_SERVICE_ACCOUNT` — full JSON of a service-account key for the
+  project. Generate one in Firebase Console → ⚙️ Project settings →
+  **Service accounts** → *Generate new private key*, and paste the entire JSON.
+
+That service account needs these IAM roles on the project (grant via
+`gcloud projects add-iam-policy-binding` or the GCP Console → IAM):
+
+- `roles/firebaserules.admin` — deploy Firestore **and** Storage rules
+- `roles/datastore.indexAdmin` — deploy Firestore indexes
+- `roles/serviceusage.serviceUsageConsumer` — pass the API-enabled check
+- `roles/firebasestorage.admin` — only if the Storage deploy step 403s on
+  bucket resolution (the rules themselves go through `firebaserules.admin`)
+
+> The default Firebase Admin SDK key ships with only
+> `firebase.sdkAdminServiceAgent` — not enough to deploy. Grant the roles above
+> or the deploy fails with `403 Permission denied`.
+
+### Firebase Storage (requires Blaze)
+
+Sapling and discovery photo uploads use **Firebase Storage**, which requires
+the **Blaze** plan. Enable it in the console (Build → Storage → Get started),
+then `storage.rules` deploys automatically via `firestore-deploy.yml`. Profile
+avatars don't need Storage — they're stored as base64 in the `users/{uid}` doc.
+
+### App Distribution (`app-distribution.yml`)
+
+Builds a debug APK after CI succeeds and uploads it to Firebase App
+Distribution. Needs, in addition to the secrets above:
+
+- `FIREBASE_ANDROID_APP_ID` — the Android app ID (Project settings → your
+  Android app → *App ID*, e.g. `1:NNN:android:xxxx`)
+- reuses `FIREBASE_SERVICE_ACCOUNT` for upload credentials
+
 `release.yml` (signed release builds) additionally needs Android signing
 secrets (`KEYSTORE_BASE64`, etc.) — review it before relying on it.
-```
