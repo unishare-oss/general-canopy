@@ -11,19 +11,27 @@ import 'package:canopy/features/saplings/domain/usecases/create_sapling.dart';
 import 'package:canopy/features/saplings/presentation/providers/sapling_repository_provider.dart';
 
 const _palette = [
-  '2F7D4F', '5A9B6F', 'E05B3C', 'F2C94C', 'E8A0C8',
-  'F6A623', '4A7C59', 'C0392B', 'D4A043', '7BAE6E',
-  'A0724A', '8FBC8F', 'C4A87A', '4A90D9', 'E67E22',
+  '2F7D4F',
+  '5A9B6F',
+  'E05B3C',
+  'F2C94C',
+  'E8A0C8',
+  'F6A623',
+  '4A7C59',
+  'C0392B',
+  'D4A043',
+  '7BAE6E',
+  'A0724A',
+  '8FBC8F',
+  'C4A87A',
+  '4A90D9',
+  'E67E22',
 ];
 
 String _randomColor() => _palette[Random().nextInt(_palette.length)];
 
 class CreateSaplingScreen extends ConsumerStatefulWidget {
-  const CreateSaplingScreen({
-    super.key,
-    required this.lat,
-    required this.lng,
-  });
+  const CreateSaplingScreen({super.key, required this.lat, required this.lng});
 
   final double lat;
   final double lng;
@@ -81,15 +89,16 @@ class _CreateSaplingScreenState extends ConsumerState<CreateSaplingScreen> {
   }
 
   void _clearPhoto() => setState(() {
-        _pickedPhotoBytes = null;
-        _pickedPhotoName = null;
-      });
+    _pickedPhotoBytes = null;
+    _pickedPhotoName = null;
+  });
 
   Future<String?> _uploadPhoto() async {
     if (_pickedPhotoBytes == null) return null;
     final ext = (_pickedPhotoName ?? 'photo.jpg').split('.').last.toLowerCase();
-    final ref = FirebaseStorage.instance
-        .ref('saplings/${DateTime.now().millisecondsSinceEpoch}.$ext');
+    final ref = FirebaseStorage.instance.ref(
+      'saplings/${DateTime.now().millisecondsSinceEpoch}.$ext',
+    );
     // putString+base64 works on all platforms: avoids the dart2js Int64 issue
     // that breaks putData on web, and avoids putBlob which is native-only.
     await ref.putString(
@@ -121,8 +130,9 @@ class _CreateSaplingScreenState extends ConsumerState<CreateSaplingScreen> {
       if (mounted) context.go('/sapling/$id');
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     } finally {
       if (mounted) setState(() => _submitting = false);
@@ -156,8 +166,7 @@ class _CreateSaplingScreenState extends ConsumerState<CreateSaplingScreen> {
                 const SizedBox(height: 6),
                 TextFormField(
                   controller: _speciesCtrl,
-                  decoration:
-                      const InputDecoration(hintText: 'e.g. Rain Tree'),
+                  decoration: const InputDecoration(hintText: 'e.g. Rain Tree'),
                   validator: _required,
                   textCapitalization: TextCapitalization.words,
                 ),
@@ -167,7 +176,8 @@ class _CreateSaplingScreenState extends ConsumerState<CreateSaplingScreen> {
                 TextFormField(
                   controller: _latinCtrl,
                   decoration: const InputDecoration(
-                      hintText: 'e.g. Samanea saman'),
+                    hintText: 'e.g. Samanea saman',
+                  ),
                   validator: _required,
                   textCapitalization: TextCapitalization.sentences,
                 ),
@@ -190,7 +200,8 @@ class _CreateSaplingScreenState extends ConsumerState<CreateSaplingScreen> {
                 TextFormField(
                   controller: _streetCtrl,
                   decoration: const InputDecoration(
-                      hintText: 'e.g. Silom Rd, near BTS Sala Daeng'),
+                    hintText: 'e.g. Silom Rd, near BTS Sala Daeng',
+                  ),
                   validator: _required,
                   textCapitalization: TextCapitalization.sentences,
                 ),
@@ -199,8 +210,7 @@ class _CreateSaplingScreenState extends ConsumerState<CreateSaplingScreen> {
                 const SizedBox(height: 6),
                 TextFormField(
                   controller: _neighborhoodCtrl,
-                  decoration:
-                      const InputDecoration(hintText: 'e.g. Silom'),
+                  decoration: const InputDecoration(hintText: 'e.g. Silom'),
                   validator: _required,
                   textCapitalization: TextCapitalization.words,
                 ),
@@ -276,8 +286,7 @@ class _CreateSaplingScreenState extends ConsumerState<CreateSaplingScreen> {
     );
   }
 
-  Widget _label(String text, TextTheme tt) =>
-      Text(text, style: tt.labelLarge);
+  Widget _label(String text, TextTheme tt) => Text(text, style: tt.labelLarge);
 
   String? _required(String? v) =>
       (v == null || v.trim().isEmpty) ? 'Required' : null;

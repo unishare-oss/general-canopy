@@ -15,17 +15,16 @@ class CreateSapling {
     required double lng,
     required String colorHex,
     String? photoUrl,
-  }) =>
-      _repository.createSapling(
-        nickname: nickname,
-        species: species,
-        latin: latin,
-        personality: personality,
-        street: street,
-        neighborhood: neighborhood,
-        lat: lat,
-        lng: lng,
-        colorHex: colorHex,
-        photoUrl: photoUrl,
-      );
+  }) => _repository.createSapling(
+    nickname: nickname,
+    species: species,
+    latin: latin,
+    personality: personality,
+    street: street,
+    neighborhood: neighborhood,
+    lat: lat,
+    lng: lng,
+    colorHex: colorHex,
+    photoUrl: photoUrl,
+  );
 }

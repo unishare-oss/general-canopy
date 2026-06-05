@@ -13,9 +13,21 @@ import 'package:canopy/features/discoveries/domain/usecases/update_discovery.dar
 import 'package:canopy/features/discoveries/presentation/providers/discovery_repository_provider.dart';
 
 const _palette = [
-  '2F7D4F', '5A9B6F', 'E05B3C', 'F2C94C', 'E8A0C8',
-  'F6A623', '4A7C59', 'C0392B', 'D4A043', '7BAE6E',
-  'A0724A', '8FBC8F', 'C4A87A', '4A90D9', 'E67E22',
+  '2F7D4F',
+  '5A9B6F',
+  'E05B3C',
+  'F2C94C',
+  'E8A0C8',
+  'F6A623',
+  '4A7C59',
+  'C0392B',
+  'D4A043',
+  '7BAE6E',
+  'A0724A',
+  '8FBC8F',
+  'C4A87A',
+  '4A90D9',
+  'E67E22',
 ];
 
 String _randomColor() => _palette[Random().nextInt(_palette.length)];
@@ -86,16 +98,17 @@ class _CreateEditDiscoveryScreenState
   }
 
   void _clearPhoto() => setState(() {
-        _pickedPhotoBytes = null;
-        _pickedPhotoName = null;
-        _existingPhotoUrl = null;
-      });
+    _pickedPhotoBytes = null;
+    _pickedPhotoName = null;
+    _existingPhotoUrl = null;
+  });
 
   Future<String?> _uploadPhoto() async {
     if (_pickedPhotoBytes == null) return _existingPhotoUrl;
     final ext = (_pickedPhotoName ?? 'photo.jpg').split('.').last.toLowerCase();
-    final ref = FirebaseStorage.instance
-        .ref('discoveries/${DateTime.now().millisecondsSinceEpoch}.$ext');
+    final ref = FirebaseStorage.instance.ref(
+      'discoveries/${DateTime.now().millisecondsSinceEpoch}.$ext',
+    );
     await ref.putData(
       _pickedPhotoBytes!,
       SettableMetadata(contentType: 'image/$ext'),
@@ -113,41 +126,46 @@ class _CreateEditDiscoveryScreenState
       final lng = widget.initialLng ?? widget.discovery?.lng ?? 0.0;
 
       if (_isEditing) {
-        await UpdateDiscovery(repo)(Discovery(
-          id: widget.discovery!.id,
-          title: _titleCtrl.text.trim(),
-          description: _descriptionCtrl.text.trim(),
-          category: _categoryCtrl.text.trim(),
-          lat: lat,
-          lng: lng,
-          neighborhood: _neighborhoodCtrl.text.trim(),
-          colorHex: _colorHex,
-          createdAt: widget.discovery!.createdAt,
-          createdBy: widget.discovery!.createdBy,
-          photoUrl: photoUrl,
-        ));
+        await UpdateDiscovery(repo)(
+          Discovery(
+            id: widget.discovery!.id,
+            title: _titleCtrl.text.trim(),
+            description: _descriptionCtrl.text.trim(),
+            category: _categoryCtrl.text.trim(),
+            lat: lat,
+            lng: lng,
+            neighborhood: _neighborhoodCtrl.text.trim(),
+            colorHex: _colorHex,
+            createdAt: widget.discovery!.createdAt,
+            createdBy: widget.discovery!.createdBy,
+            photoUrl: photoUrl,
+          ),
+        );
         if (mounted) context.pop();
       } else {
         final uid = ref.read(authStateProvider).value?.id ?? '';
-        final newId = await CreateDiscovery(repo)(Discovery(
-          id: '',
-          title: _titleCtrl.text.trim(),
-          description: _descriptionCtrl.text.trim(),
-          category: _categoryCtrl.text.trim(),
-          lat: lat,
-          lng: lng,
-          neighborhood: _neighborhoodCtrl.text.trim(),
-          colorHex: _colorHex,
-          createdAt: DateTime.now(),
-          createdBy: uid,
-          photoUrl: photoUrl,
-        ));
+        final newId = await CreateDiscovery(repo)(
+          Discovery(
+            id: '',
+            title: _titleCtrl.text.trim(),
+            description: _descriptionCtrl.text.trim(),
+            category: _categoryCtrl.text.trim(),
+            lat: lat,
+            lng: lng,
+            neighborhood: _neighborhoodCtrl.text.trim(),
+            colorHex: _colorHex,
+            createdAt: DateTime.now(),
+            createdBy: uid,
+            photoUrl: photoUrl,
+          ),
+        );
         if (mounted) context.go('/discovery/$newId');
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     } finally {
       if (mounted) setState(() => _submitting = false);
@@ -209,8 +227,7 @@ class _CreateEditDiscoveryScreenState
                 const SizedBox(height: 6),
                 TextFormField(
                   controller: _neighborhoodCtrl,
-                  decoration:
-                      const InputDecoration(hintText: 'e.g. Silom'),
+                  decoration: const InputDecoration(hintText: 'e.g. Silom'),
                   validator: _required,
                   textCapitalization: TextCapitalization.words,
                 ),
@@ -221,8 +238,7 @@ class _CreateEditDiscoveryScreenState
                 const SizedBox(height: 24),
                 FilledButton(
                   onPressed: _submitting ? null : _submit,
-                  child:
-                      Text(_isEditing ? 'Save changes' : 'Create discovery'),
+                  child: Text(_isEditing ? 'Save changes' : 'Create discovery'),
                 ),
                 const SizedBox(height: 24),
               ],
@@ -239,11 +255,16 @@ class _CreateEditDiscoveryScreenState
 
   Widget _buildPhotoPicker(ColorScheme cs) {
     if (_pickedPhotoBytes != null) {
-      return _photoPreview(Image.memory(_pickedPhotoBytes!, fit: BoxFit.cover), cs);
+      return _photoPreview(
+        Image.memory(_pickedPhotoBytes!, fit: BoxFit.cover),
+        cs,
+      );
     }
     if (_existingPhotoUrl != null) {
       return _photoPreview(
-          Image.network(_existingPhotoUrl!, fit: BoxFit.cover), cs);
+        Image.network(_existingPhotoUrl!, fit: BoxFit.cover),
+        cs,
+      );
     }
     return SizedBox(
       width: double.infinity,
@@ -260,11 +281,7 @@ class _CreateEditDiscoveryScreenState
       children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(8),
-          child: SizedBox(
-            height: 180,
-            width: double.infinity,
-            child: image,
-          ),
+          child: SizedBox(height: 180, width: double.infinity, child: image),
         ),
         Positioned(
           top: 8,
@@ -295,8 +312,7 @@ class _CreateEditDiscoveryScreenState
     );
   }
 
-  Widget _label(String text, TextTheme tt) =>
-      Text(text, style: tt.labelLarge);
+  Widget _label(String text, TextTheme tt) => Text(text, style: tt.labelLarge);
 
   String? _required(String? v) =>
       (v == null || v.trim().isEmpty) ? 'Required' : null;

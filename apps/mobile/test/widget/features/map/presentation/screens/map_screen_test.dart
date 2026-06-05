@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -33,6 +35,85 @@ Sapling _sapling(String id, {SaplingStatus status = SaplingStatus.available}) =>
       status: status,
     );
 
+// Offline tile provider so FlutterMap never issues real OSM tile HTTP
+// requests during widget tests (which fail with ClientException in the
+// sandbox). Returns a 1x1 transparent PNG for every tile.
+class _OfflineTileProvider extends TileProvider {
+  @override
+  ImageProvider getImage(TileCoordinates coordinates, TileLayer options) =>
+      MemoryImage(_transparentPixelPng);
+}
+
+final Uint8List _transparentPixelPng = Uint8List.fromList(const <int>[
+  0x89,
+  0x50,
+  0x4E,
+  0x47,
+  0x0D,
+  0x0A,
+  0x1A,
+  0x0A,
+  0x00,
+  0x00,
+  0x00,
+  0x0D,
+  0x49,
+  0x48,
+  0x44,
+  0x52,
+  0x00,
+  0x00,
+  0x00,
+  0x01,
+  0x00,
+  0x00,
+  0x00,
+  0x01,
+  0x08,
+  0x06,
+  0x00,
+  0x00,
+  0x00,
+  0x1F,
+  0x15,
+  0xC4,
+  0x89,
+  0x00,
+  0x00,
+  0x00,
+  0x0A,
+  0x49,
+  0x44,
+  0x41,
+  0x54,
+  0x78,
+  0x9C,
+  0x63,
+  0x00,
+  0x01,
+  0x00,
+  0x00,
+  0x05,
+  0x00,
+  0x01,
+  0x0D,
+  0x0A,
+  0x2D,
+  0xB4,
+  0x00,
+  0x00,
+  0x00,
+  0x00,
+  0x49,
+  0x45,
+  0x4E,
+  0x44,
+  0xAE,
+  0x42,
+  0x60,
+  0x82,
+]);
+
 Widget _buildSubject(List<Sapling> saplings) {
   return ProviderScope(
     overrides: [
@@ -40,7 +121,7 @@ Widget _buildSubject(List<Sapling> saplings) {
     ],
     child: MaterialApp(
       theme: AppTheme.build(AppThemes.canopy),
-      home: const Scaffold(body: MapScreen()),
+      home: Scaffold(body: MapScreen(tileProvider: _OfflineTileProvider())),
     ),
   );
 }
@@ -69,12 +150,15 @@ void main() {
       await tester.pumpWidget(_buildSubject(saplings));
       await tester.pump();
 
-      // FlutterMap renders markers via MarkerLayer. We verify MarkerLayer is
-      // present; the exact Marker count is checked via the widget state.
-      expect(find.byType(MarkerLayer), findsOneWidget);
-
-      final markerLayer = tester.widget<MarkerLayer>(find.byType(MarkerLayer));
-      expect(markerLayer.markers.length, saplings.length);
+      // The map renders separate MarkerLayers for saplings and discoveries.
+      // Sum markers across all layers; with no discoveries overridden, the
+      // total equals the sapling count.
+      final layers = tester.widgetList<MarkerLayer>(find.byType(MarkerLayer));
+      final totalMarkers = layers.fold<int>(
+        0,
+        (sum, l) => sum + l.markers.length,
+      );
+      expect(totalMarkers, saplings.length);
     });
 
     testWidgets('renders FlutterMap with zero markers when list is empty', (
@@ -84,8 +168,12 @@ void main() {
       await tester.pump();
 
       expect(find.byType(FlutterMap), findsOneWidget);
-      final markerLayer = tester.widget<MarkerLayer>(find.byType(MarkerLayer));
-      expect(markerLayer.markers, isEmpty);
+      final layers = tester.widgetList<MarkerLayer>(find.byType(MarkerLayer));
+      final totalMarkers = layers.fold<int>(
+        0,
+        (sum, l) => sum + l.markers.length,
+      );
+      expect(totalMarkers, 0);
     });
 
     testWidgets('shows loading indicator before data arrives', (tester) async {

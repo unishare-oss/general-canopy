@@ -20,10 +20,7 @@ Future<({Uint8List? bytes, String? name})> pickPhoto() async {
     final reader = html.FileReader();
     reader.readAsArrayBuffer(file);
     reader.onLoadEnd.listen((_) {
-      completer.complete((
-        bytes: reader.result as Uint8List?,
-        name: file.name,
-      ));
+      completer.complete((bytes: reader.result as Uint8List?, name: file.name));
     });
   });
 

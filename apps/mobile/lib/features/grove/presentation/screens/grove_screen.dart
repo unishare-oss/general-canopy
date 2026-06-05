@@ -638,7 +638,10 @@ class _AdoptedSaplingCard extends StatelessWidget {
               child: sapling.photoUrl != null
                   ? ClipRRect(
                       borderRadius: BorderRadius.circular(12),
-                      child: Image.network(sapling.photoUrl!, fit: BoxFit.cover),
+                      child: Image.network(
+                        sapling.photoUrl!,
+                        fit: BoxFit.cover,
+                      ),
                     )
                   : Icon(Icons.park_rounded, color: accent, size: 28),
             ),

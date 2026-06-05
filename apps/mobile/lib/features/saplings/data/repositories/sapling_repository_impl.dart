@@ -39,27 +39,26 @@ class SaplingRepositoryImpl implements SaplingRepository {
     required double lng,
     required String colorHex,
     String? photoUrl,
-  }) =>
-      _datasource.createSapling(
-        SaplingModel(
-          nickname: nickname,
-          species: species,
-          latin: latin,
-          personality: personality,
-          street: street,
-          neighborhood: neighborhood,
-          lat: lat,
-          lng: lng,
-          colorHex: colorHex,
-          photoUrl: photoUrl,
-          ageLabel: '~1 year',
-          heightLabel: '1.0 m',
-          waterNeedLabel: 'Moderate',
-          lightLabel: 'Full sun',
-          wateringIntervalDays: 3,
-          status: 'available',
-        ),
-      );
+  }) => _datasource.createSapling(
+    SaplingModel(
+      nickname: nickname,
+      species: species,
+      latin: latin,
+      personality: personality,
+      street: street,
+      neighborhood: neighborhood,
+      lat: lat,
+      lng: lng,
+      colorHex: colorHex,
+      photoUrl: photoUrl,
+      ageLabel: '~1 year',
+      heightLabel: '1.0 m',
+      waterNeedLabel: 'Moderate',
+      lightLabel: 'Full sun',
+      wateringIntervalDays: 3,
+      status: 'available',
+    ),
+  );
 
   @override
   Future<void> adoptSapling({

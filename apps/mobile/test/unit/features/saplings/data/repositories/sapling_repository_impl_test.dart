@@ -12,7 +12,8 @@ import 'package:canopy/features/saplings/domain/entities/sapling_exceptions.dart
 
 class _FakeDatasource implements FirestoreSaplingDatasource {
   @override
-  Future<String> createSapling(SaplingModel model) => throw UnimplementedError();
+  Future<String> createSapling(SaplingModel model) =>
+      throw UnimplementedError();
 
   final List<(String, SaplingModel)> _available;
   final List<(String, SaplingModel)> _all;

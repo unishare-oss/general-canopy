@@ -17,7 +17,11 @@ import 'package:canopy/features/saplings/domain/entities/sapling.dart';
 import 'package:canopy/features/saplings/presentation/providers/available_saplings_provider.dart';
 
 class MapScreen extends ConsumerWidget {
-  const MapScreen({super.key});
+  const MapScreen({super.key, this.tileProvider});
+
+  /// Overrides the map's tile source. Defaults to the network OSM tiles in the
+  /// app; tests inject an offline provider to avoid real HTTP requests.
+  final TileProvider? tileProvider;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -26,14 +30,16 @@ class MapScreen extends ConsumerWidget {
     return allAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => const Center(child: Text('Could not load map.')),
-      data: (saplings) => _SaplingMap(saplings: saplings),
+      data: (saplings) =>
+          _SaplingMap(saplings: saplings, tileProvider: tileProvider),
     );
   }
 }
 
 class _SaplingMap extends ConsumerStatefulWidget {
-  const _SaplingMap({required this.saplings});
+  const _SaplingMap({required this.saplings, this.tileProvider});
   final List<Sapling> saplings;
+  final TileProvider? tileProvider;
 
   @override
   ConsumerState<_SaplingMap> createState() => _SaplingMapState();
@@ -188,15 +194,16 @@ class _SaplingMapState extends ConsumerState<_SaplingMap> {
             },
             onTap: isAdmin
                 ? (_, point) => context.push(
-                      '/sapling/create',
-                      extra: {'lat': point.latitude, 'lng': point.longitude},
-                    )
+                    '/sapling/create',
+                    extra: {'lat': point.latitude, 'lng': point.longitude},
+                  )
                 : null,
           ),
           children: [
             TileLayer(
               urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
               userAgentPackageName: 'com.canopy.app',
+              tileProvider: widget.tileProvider,
             ),
             if (_showLocation)
               CurrentLocationLayer(
@@ -217,12 +224,7 @@ class _SaplingMapState extends ConsumerState<_SaplingMap> {
         ),
         Positioned(top: 12, right: 12, child: _LegendButton()),
         if (isAdmin)
-          Positioned(
-            top: 12,
-            left: 12,
-            right: 64,
-            child: _AdminHintBanner(),
-          ),
+          Positioned(top: 12, left: 12, right: 64, child: _AdminHintBanner()),
         Positioned(
           bottom: 16,
           right: 16,
@@ -254,9 +256,9 @@ class _AdminHintBanner extends StatelessWidget {
           const SizedBox(width: 6),
           Text(
             'Tap map to place a sapling',
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: cs.onPrimaryContainer,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.labelSmall?.copyWith(color: cs.onPrimaryContainer),
           ),
         ],
       ),
