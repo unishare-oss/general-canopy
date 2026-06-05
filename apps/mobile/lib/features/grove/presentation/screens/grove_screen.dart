@@ -248,6 +248,22 @@ class _GroveContent extends StatelessWidget {
           ),
 
         // ── On your block ─────────────────────────────────────────────────
+        if (adoptedSaplings.isNotEmpty)
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+            sliver: SliverList.separated(
+              itemCount: adoptedSaplings.length,
+              separatorBuilder: (_, _) => const SizedBox(height: 10),
+              itemBuilder: (context, i) {
+                final s = adoptedSaplings[i];
+                return _AdoptedSaplingCard(
+                  sapling: s,
+                  onTap: () => context.go('/sapling/${s.id}'),
+                );
+              },
+            ),
+          ),
+
         if (availableSaplings.isNotEmpty) ...[
           SliverToBoxAdapter(
             child: Padding(
@@ -581,6 +597,77 @@ class _OnYourBlock extends StatelessWidget {
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+// ── Adopted Sapling Card ──────────────────────────────────────────────────────
+
+class _AdoptedSaplingCard extends StatelessWidget {
+  const _AdoptedSaplingCard({required this.sapling, this.onTap});
+
+  final Sapling sapling;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+    final accent = Color(
+      int.parse('0xFF${sapling.colorHex.replaceFirst('#', '')}'),
+    );
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: cs.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Theme.of(context).dividerColor),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                color: accent.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: sapling.photoUrl != null
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.network(sapling.photoUrl!, fit: BoxFit.cover),
+                    )
+                  : Icon(Icons.park_rounded, color: accent, size: 28),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    sapling.nickname,
+                    style: tt.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '${sapling.species} · ${sapling.street.isNotEmpty ? sapling.street : sapling.neighborhood}',
+                    style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right, color: cs.onSurfaceVariant),
+          ],
+        ),
       ),
     );
   }

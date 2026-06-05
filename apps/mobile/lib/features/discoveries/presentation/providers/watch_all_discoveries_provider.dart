@@ -5,6 +5,6 @@ import 'package:canopy/features/discoveries/presentation/providers/discovery_rep
 
 part 'watch_all_discoveries_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 Stream<List<Discovery>> watchAllDiscoveries(Ref ref) =>
     WatchAllDiscoveries(ref.watch(discoveryRepositoryProvider))();

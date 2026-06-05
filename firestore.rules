@@ -54,7 +54,8 @@ service cloud.firestore {
             && request.resource.data.status == 'available')
         );
 
-      allow create: if false;
+      allow create: if request.auth != null
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isAdmin == true;
       allow delete: if false;
     }
 

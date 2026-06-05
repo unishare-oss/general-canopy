@@ -7,6 +7,7 @@ abstract interface class FirestoreSaplingDatasource {
   Stream<List<(String id, SaplingModel model)>> watchAllSaplings();
   Future<(String id, SaplingModel model)> getSaplingById(String id);
   Stream<(String id, SaplingModel model)> watchSaplingById(String id);
+  Future<String> createSapling(SaplingModel model);
   Future<void> adoptSapling({
     required String saplingId,
     required String uid,
@@ -59,6 +60,12 @@ class FirestoreSaplingDatasourceImpl implements FirestoreSaplingDatasource {
         }
         return (doc.id, SaplingModel.fromJson(doc.data()!));
       });
+
+  @override
+  Future<String> createSapling(SaplingModel model) async {
+    final ref = await _saplings.add(model.toJson());
+    return ref.id;
+  }
 
   DocumentReference<Map<String, dynamic>> _adoptionRef(
     String uid,

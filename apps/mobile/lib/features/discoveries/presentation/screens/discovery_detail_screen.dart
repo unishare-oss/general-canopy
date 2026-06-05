@@ -4,8 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:canopy/features/admin/presentation/providers/is_admin_provider.dart';
 import 'package:canopy/features/discoveries/domain/entities/discovery.dart';
 import 'package:canopy/features/discoveries/domain/usecases/delete_discovery.dart';
+import 'package:canopy/features/discoveries/presentation/providers/discovery_by_id_provider.dart';
 import 'package:canopy/features/discoveries/presentation/providers/discovery_repository_provider.dart';
-import 'package:canopy/features/discoveries/presentation/providers/watch_all_discoveries_provider.dart';
 
 class DiscoveryDetailScreen extends ConsumerWidget {
   const DiscoveryDetailScreen({super.key, required this.discoveryId});
@@ -14,10 +14,10 @@ class DiscoveryDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final discoveriesAsync = ref.watch(watchAllDiscoveriesProvider);
-    final isAdminAsync = ref.watch(isAdminProvider);
+    final discoveryAsync = ref.watch(discoveryByIdProvider(discoveryId));
+    final isAdmin = ref.watch(isAdminProvider).value ?? false;
 
-    return discoveriesAsync.when(
+    return discoveryAsync.when(
       loading: () => Scaffold(
         appBar: AppBar(),
         body: const Center(child: CircularProgressIndicator()),
@@ -26,29 +26,13 @@ class DiscoveryDetailScreen extends ConsumerWidget {
         appBar: AppBar(),
         body: const Center(child: Text('Could not load discovery.')),
       ),
-      data: (discoveries) {
-        final discovery = discoveries.cast<Discovery?>().firstWhere(
-          (d) => d?.id == discoveryId,
-          orElse: () => null,
-        );
-
-        if (discovery == null) {
-          return Scaffold(
-            appBar: AppBar(),
-            body: const Center(child: Text('Discovery not found.')),
-          );
-        }
-
-        final isAdmin = isAdminAsync.value ?? false;
-
-        return _DiscoveryDetailView(
-          discovery: discovery,
-          isAdmin: isAdmin,
-          onEdit: () =>
-              context.push('/discovery/$discoveryId/edit', extra: discovery),
-          onDelete: () => _confirmDelete(context, ref, discovery),
-        );
-      },
+      data: (discovery) => _DiscoveryDetailView(
+        discovery: discovery,
+        isAdmin: isAdmin,
+        onEdit: () =>
+            context.push('/discovery/$discoveryId/edit', extra: discovery),
+        onDelete: () => _confirmDelete(context, ref, discovery),
+      ),
     );
   }
 

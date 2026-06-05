@@ -45,7 +45,11 @@ dependencies:
   firebase_auth: ^6.5.1
   cloud_firestore: ^6.4.1
   firebase_crashlytics: ^5.2.2
+  firebase_storage: ^13.4.2
   google_sign_in: ^7.2.0
+
+  # Media
+  image_picker: ^1.1.2
 
   # Offline + models
   hive_flutter: ^1.1.0

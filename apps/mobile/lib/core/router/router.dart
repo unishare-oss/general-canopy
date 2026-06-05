@@ -20,6 +20,7 @@ import 'package:canopy/features/you/presentation/screens/you_screen.dart';
 import 'package:canopy/features/discoveries/domain/entities/discovery.dart';
 import 'package:canopy/features/discoveries/presentation/screens/create_edit_discovery_screen.dart';
 import 'package:canopy/features/discoveries/presentation/screens/discovery_detail_screen.dart';
+import 'package:canopy/features/saplings/presentation/screens/create_sapling_screen.dart';
 
 part 'router.g.dart';
 
@@ -121,6 +122,17 @@ GoRouter router(Ref ref) {
         builder: (context, state) => const OnboardingScreen(),
       ),
       // Top-level route so it can be pushed from any tab (Discover or Map).
+      // /sapling/create must come before /sapling/:id to avoid collision.
+      GoRoute(
+        path: '/sapling/create',
+        builder: (c, s) {
+          final coords = s.extra as Map<String, double>?;
+          return CreateSaplingScreen(
+            lat: coords?['lat'] ?? 13.7563,
+            lng: coords?['lng'] ?? 100.5018,
+          );
+        },
+      ),
       GoRoute(
         path: '/sapling/:id',
         builder: (context, state) => discover.SaplingDetailScreen(
@@ -130,7 +142,13 @@ GoRouter router(Ref ref) {
       // Discovery routes — create must be listed before :id to avoid collision.
       GoRoute(
         path: '/discovery/create',
-        builder: (c, s) => const CreateEditDiscoveryScreen(),
+        builder: (c, s) {
+          final coords = s.extra as Map<String, double>?;
+          return CreateEditDiscoveryScreen(
+            initialLat: coords?['lat'],
+            initialLng: coords?['lng'],
+          );
+        },
       ),
       GoRoute(
         path: '/discovery/:id/edit',

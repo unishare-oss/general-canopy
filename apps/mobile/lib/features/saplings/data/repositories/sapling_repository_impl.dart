@@ -1,4 +1,5 @@
 import 'package:canopy/features/saplings/data/datasources/firestore_sapling_datasource.dart';
+import 'package:canopy/features/saplings/data/models/sapling_model.dart';
 import 'package:canopy/features/saplings/domain/entities/sapling.dart';
 import 'package:canopy/features/saplings/domain/repositories/sapling_repository.dart';
 
@@ -25,6 +26,40 @@ class SaplingRepositoryImpl implements SaplingRepository {
   @override
   Stream<Sapling> watchSaplingById(String id) =>
       _datasource.watchSaplingById(id).map((r) => r.$2.toEntity(r.$1));
+
+  @override
+  Future<String> createSapling({
+    required String nickname,
+    required String species,
+    required String latin,
+    required String personality,
+    required String street,
+    required String neighborhood,
+    required double lat,
+    required double lng,
+    required String colorHex,
+    String? photoUrl,
+  }) =>
+      _datasource.createSapling(
+        SaplingModel(
+          nickname: nickname,
+          species: species,
+          latin: latin,
+          personality: personality,
+          street: street,
+          neighborhood: neighborhood,
+          lat: lat,
+          lng: lng,
+          colorHex: colorHex,
+          photoUrl: photoUrl,
+          ageLabel: '~1 year',
+          heightLabel: '1.0 m',
+          waterNeedLabel: 'Moderate',
+          lightLabel: 'Full sun',
+          wateringIntervalDays: 3,
+          status: 'available',
+        ),
+      );
 
   @override
   Future<void> adoptSapling({

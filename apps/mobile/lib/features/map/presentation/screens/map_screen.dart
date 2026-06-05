@@ -184,6 +184,12 @@ class _SaplingMapState extends ConsumerState<_SaplingMap> {
                 setState(() => _followMode = AlignOnUpdate.never);
               }
             },
+            onTap: isAdmin
+                ? (_, point) => context.push(
+                      '/sapling/create',
+                      extra: {'lat': point.latitude, 'lng': point.longitude},
+                    )
+                : null,
           ),
           children: [
             TileLayer(
@@ -207,29 +213,50 @@ class _SaplingMapState extends ConsumerState<_SaplingMap> {
           ],
         ),
         Positioned(top: 12, right: 12, child: _LegendButton()),
+        if (isAdmin)
+          Positioned(
+            top: 12,
+            left: 12,
+            right: 64,
+            child: _AdminHintBanner(),
+          ),
         Positioned(
           bottom: 16,
           right: 16,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (isAdmin) ...[
-                FloatingActionButton(
-                  heroTag: 'addDiscovery',
-                  onPressed: () => context.push('/discovery/create'),
-                  child: const Icon(Icons.add),
-                ),
-                const SizedBox(height: 8),
-              ],
-              _LocationFAB(
-                showLocation: _showLocation,
-                isFollowing: _followMode == AlignOnUpdate.always,
-                onPressed: _onLocationPressed,
-              ),
-            ],
+          child: _LocationFAB(
+            showLocation: _showLocation,
+            isFollowing: _followMode == AlignOnUpdate.always,
+            onPressed: _onLocationPressed,
           ),
         ),
       ],
+    );
+  }
+}
+
+class _AdminHintBanner extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: cs.primaryContainer.withValues(alpha: 0.92),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.touch_app, size: 14, color: cs.onPrimaryContainer),
+          const SizedBox(width: 6),
+          Text(
+            'Tap map to place a sapling',
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: cs.onPrimaryContainer,
+                ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -333,13 +360,6 @@ class _LegendButton extends StatelessWidget {
                 label: 'Adopted',
                 description: 'A community member is caring for this tree.',
                 showPin: true,
-              ),
-              const SizedBox(height: 12),
-              _LegendRow(
-                icon: Icons.place,
-                color: cs.secondary,
-                label: 'Discovery',
-                description: 'A point of interest in the urban forest.',
               ),
             ],
           ),

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
@@ -6,11 +7,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:canopy/shared/utils/pick_photo.dart';
-import 'package:canopy/features/auth/presentation/providers/auth_state_provider.dart';
-import 'package:canopy/features/discoveries/domain/entities/discovery.dart';
-import 'package:canopy/features/discoveries/domain/usecases/create_discovery.dart';
-import 'package:canopy/features/discoveries/domain/usecases/update_discovery.dart';
-import 'package:canopy/features/discoveries/presentation/providers/discovery_repository_provider.dart';
+import 'package:canopy/features/saplings/domain/usecases/create_sapling.dart';
+import 'package:canopy/features/saplings/presentation/providers/sapling_repository_provider.dart';
 
 const _palette = [
   '2F7D4F', '5A9B6F', 'E05B3C', 'F2C94C', 'E8A0C8',
@@ -20,57 +18,55 @@ const _palette = [
 
 String _randomColor() => _palette[Random().nextInt(_palette.length)];
 
-class CreateEditDiscoveryScreen extends ConsumerStatefulWidget {
-  const CreateEditDiscoveryScreen({
+class CreateSaplingScreen extends ConsumerStatefulWidget {
+  const CreateSaplingScreen({
     super.key,
-    this.discovery,
-    this.initialLat,
-    this.initialLng,
+    required this.lat,
+    required this.lng,
   });
 
-  final Discovery? discovery;
-  final double? initialLat;
-  final double? initialLng;
+  final double lat;
+  final double lng;
 
   @override
-  ConsumerState<CreateEditDiscoveryScreen> createState() =>
-      _CreateEditDiscoveryScreenState();
+  ConsumerState<CreateSaplingScreen> createState() =>
+      _CreateSaplingScreenState();
 }
 
-class _CreateEditDiscoveryScreenState
-    extends ConsumerState<CreateEditDiscoveryScreen> {
+class _CreateSaplingScreenState extends ConsumerState<CreateSaplingScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  late final TextEditingController _titleCtrl;
-  late final TextEditingController _descriptionCtrl;
-  late final TextEditingController _categoryCtrl;
+  late final TextEditingController _nicknameCtrl;
+  late final TextEditingController _speciesCtrl;
+  late final TextEditingController _latinCtrl;
+  late final TextEditingController _personalityCtrl;
+  late final TextEditingController _streetCtrl;
   late final TextEditingController _neighborhoodCtrl;
   late final String _colorHex;
 
-  String? _existingPhotoUrl;
   String? _pickedPhotoName;
   Uint8List? _pickedPhotoBytes;
   bool _submitting = false;
 
-  bool get _isEditing => widget.discovery != null;
-
   @override
   void initState() {
     super.initState();
-    final d = widget.discovery;
-    _titleCtrl = TextEditingController(text: d?.title ?? '');
-    _descriptionCtrl = TextEditingController(text: d?.description ?? '');
-    _categoryCtrl = TextEditingController(text: d?.category ?? '');
-    _neighborhoodCtrl = TextEditingController(text: d?.neighborhood ?? '');
-    _colorHex = d != null ? d.colorHex.replaceFirst('#', '') : _randomColor();
-    _existingPhotoUrl = d?.photoUrl;
+    _nicknameCtrl = TextEditingController();
+    _speciesCtrl = TextEditingController();
+    _latinCtrl = TextEditingController();
+    _personalityCtrl = TextEditingController();
+    _streetCtrl = TextEditingController();
+    _neighborhoodCtrl = TextEditingController();
+    _colorHex = _randomColor();
   }
 
   @override
   void dispose() {
-    _titleCtrl.dispose();
-    _descriptionCtrl.dispose();
-    _categoryCtrl.dispose();
+    _nicknameCtrl.dispose();
+    _speciesCtrl.dispose();
+    _latinCtrl.dispose();
+    _personalityCtrl.dispose();
+    _streetCtrl.dispose();
     _neighborhoodCtrl.dispose();
     super.dispose();
   }
@@ -81,24 +77,25 @@ class _CreateEditDiscoveryScreenState
     setState(() {
       _pickedPhotoBytes = result.bytes;
       _pickedPhotoName = result.name;
-      _existingPhotoUrl = null;
     });
   }
 
   void _clearPhoto() => setState(() {
         _pickedPhotoBytes = null;
         _pickedPhotoName = null;
-        _existingPhotoUrl = null;
       });
 
   Future<String?> _uploadPhoto() async {
-    if (_pickedPhotoBytes == null) return _existingPhotoUrl;
+    if (_pickedPhotoBytes == null) return null;
     final ext = (_pickedPhotoName ?? 'photo.jpg').split('.').last.toLowerCase();
     final ref = FirebaseStorage.instance
-        .ref('discoveries/${DateTime.now().millisecondsSinceEpoch}.$ext');
-    await ref.putData(
-      _pickedPhotoBytes!,
-      SettableMetadata(contentType: 'image/$ext'),
+        .ref('saplings/${DateTime.now().millisecondsSinceEpoch}.$ext');
+    // putString+base64 works on all platforms: avoids the dart2js Int64 issue
+    // that breaks putData on web, and avoids putBlob which is native-only.
+    await ref.putString(
+      base64Encode(_pickedPhotoBytes!),
+      format: PutStringFormat.base64,
+      metadata: SettableMetadata(contentType: 'image/$ext'),
     );
     return ref.getDownloadURL();
   }
@@ -108,42 +105,20 @@ class _CreateEditDiscoveryScreenState
     setState(() => _submitting = true);
     try {
       final photoUrl = await _uploadPhoto();
-      final repo = ref.read(discoveryRepositoryProvider);
-      final lat = widget.initialLat ?? widget.discovery?.lat ?? 0.0;
-      final lng = widget.initialLng ?? widget.discovery?.lng ?? 0.0;
-
-      if (_isEditing) {
-        await UpdateDiscovery(repo)(Discovery(
-          id: widget.discovery!.id,
-          title: _titleCtrl.text.trim(),
-          description: _descriptionCtrl.text.trim(),
-          category: _categoryCtrl.text.trim(),
-          lat: lat,
-          lng: lng,
-          neighborhood: _neighborhoodCtrl.text.trim(),
-          colorHex: _colorHex,
-          createdAt: widget.discovery!.createdAt,
-          createdBy: widget.discovery!.createdBy,
-          photoUrl: photoUrl,
-        ));
-        if (mounted) context.pop();
-      } else {
-        final uid = ref.read(authStateProvider).value?.id ?? '';
-        final newId = await CreateDiscovery(repo)(Discovery(
-          id: '',
-          title: _titleCtrl.text.trim(),
-          description: _descriptionCtrl.text.trim(),
-          category: _categoryCtrl.text.trim(),
-          lat: lat,
-          lng: lng,
-          neighborhood: _neighborhoodCtrl.text.trim(),
-          colorHex: _colorHex,
-          createdAt: DateTime.now(),
-          createdBy: uid,
-          photoUrl: photoUrl,
-        ));
-        if (mounted) context.go('/discovery/$newId');
-      }
+      final repo = ref.read(saplingRepositoryProvider);
+      final id = await CreateSapling(repo)(
+        nickname: _nicknameCtrl.text.trim(),
+        species: _speciesCtrl.text.trim(),
+        latin: _latinCtrl.text.trim(),
+        personality: _personalityCtrl.text.trim(),
+        street: _streetCtrl.text.trim(),
+        neighborhood: _neighborhoodCtrl.text.trim(),
+        lat: widget.lat,
+        lng: widget.lng,
+        colorHex: _colorHex,
+        photoUrl: photoUrl,
+      );
+      if (mounted) context.go('/sapling/$id');
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context)
@@ -162,31 +137,47 @@ class _CreateEditDiscoveryScreenState
     return Stack(
       children: [
         Scaffold(
-          appBar: AppBar(
-            title: Text(_isEditing ? 'Edit discovery' : 'New discovery'),
-          ),
+          appBar: AppBar(title: const Text('New sapling')),
           body: Form(
             key: _formKey,
             child: ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                _label('Title', tt),
+                _label('Nickname', tt),
                 const SizedBox(height: 6),
                 TextFormField(
-                  controller: _titleCtrl,
+                  controller: _nicknameCtrl,
+                  decoration: const InputDecoration(hintText: 'e.g. Jamu'),
+                  validator: _required,
+                  textCapitalization: TextCapitalization.words,
+                ),
+                const SizedBox(height: 16),
+                _label('Species', tt),
+                const SizedBox(height: 6),
+                TextFormField(
+                  controller: _speciesCtrl,
+                  decoration:
+                      const InputDecoration(hintText: 'e.g. Rain Tree'),
+                  validator: _required,
+                  textCapitalization: TextCapitalization.words,
+                ),
+                const SizedBox(height: 16),
+                _label('Latin name', tt),
+                const SizedBox(height: 6),
+                TextFormField(
+                  controller: _latinCtrl,
                   decoration: const InputDecoration(
-                    hintText: 'e.g. Ancient Banyan Grove',
-                  ),
+                      hintText: 'e.g. Samanea saman'),
                   validator: _required,
                   textCapitalization: TextCapitalization.sentences,
                 ),
                 const SizedBox(height: 16),
-                _label('Description', tt),
+                _label('Personality', tt),
                 const SizedBox(height: 6),
                 TextFormField(
-                  controller: _descriptionCtrl,
+                  controller: _personalityCtrl,
                   decoration: const InputDecoration(
-                    hintText: 'Describe what makes this place special…',
+                    hintText: 'A short bio for this tree…',
                   ),
                   validator: _required,
                   minLines: 3,
@@ -194,15 +185,14 @@ class _CreateEditDiscoveryScreenState
                   textCapitalization: TextCapitalization.sentences,
                 ),
                 const SizedBox(height: 16),
-                _label('Category', tt),
+                _label('Street address', tt),
                 const SizedBox(height: 6),
                 TextFormField(
-                  controller: _categoryCtrl,
+                  controller: _streetCtrl,
                   decoration: const InputDecoration(
-                    hintText: 'e.g. Flora, Habitat, Landmark',
-                  ),
+                      hintText: 'e.g. Silom Rd, near BTS Sala Daeng'),
                   validator: _required,
-                  textCapitalization: TextCapitalization.words,
+                  textCapitalization: TextCapitalization.sentences,
                 ),
                 const SizedBox(height: 16),
                 _label('Neighborhood', tt),
@@ -221,8 +211,7 @@ class _CreateEditDiscoveryScreenState
                 const SizedBox(height: 24),
                 FilledButton(
                   onPressed: _submitting ? null : _submit,
-                  child:
-                      Text(_isEditing ? 'Save changes' : 'Create discovery'),
+                  child: const Text('Add sapling'),
                 ),
                 const SizedBox(height: 24),
               ],
@@ -239,11 +228,29 @@ class _CreateEditDiscoveryScreenState
 
   Widget _buildPhotoPicker(ColorScheme cs) {
     if (_pickedPhotoBytes != null) {
-      return _photoPreview(Image.memory(_pickedPhotoBytes!, fit: BoxFit.cover), cs);
-    }
-    if (_existingPhotoUrl != null) {
-      return _photoPreview(
-          Image.network(_existingPhotoUrl!, fit: BoxFit.cover), cs);
+      return Stack(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: SizedBox(
+              height: 180,
+              width: double.infinity,
+              child: Image.memory(_pickedPhotoBytes!, fit: BoxFit.cover),
+            ),
+          ),
+          Positioned(
+            top: 8,
+            right: 8,
+            child: Row(
+              children: [
+                _overlayBtn(Icons.edit, cs.primary, _pickPhoto),
+                const SizedBox(width: 6),
+                _overlayBtn(Icons.close, cs.error, _clearPhoto),
+              ],
+            ),
+          ),
+        ],
+      );
     }
     return SizedBox(
       width: double.infinity,
@@ -252,32 +259,6 @@ class _CreateEditDiscoveryScreenState
         icon: const Icon(Icons.add_photo_alternate_outlined),
         label: const Text('Choose photo'),
       ),
-    );
-  }
-
-  Widget _photoPreview(Widget image, ColorScheme cs) {
-    return Stack(
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: SizedBox(
-            height: 180,
-            width: double.infinity,
-            child: image,
-          ),
-        ),
-        Positioned(
-          top: 8,
-          right: 8,
-          child: Row(
-            children: [
-              _overlayBtn(Icons.edit, cs.primary, _pickPhoto),
-              const SizedBox(width: 6),
-              _overlayBtn(Icons.close, cs.error, _clearPhoto),
-            ],
-          ),
-        ),
-      ],
     );
   }
 
