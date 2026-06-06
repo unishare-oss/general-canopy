@@ -68,7 +68,7 @@ dependencies:
   # UI
   google_fonts: ^8.1.0
   flutter_svg: ^2.3.0
-  share_plus: ^10.0.0
+  share_plus: ^13.1.0
   flutter_web_plugins:
     sdk: flutter
   image: ^4.9.1
