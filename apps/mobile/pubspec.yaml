@@ -54,7 +54,7 @@ dependencies:
   # Offline + models
   hive_flutter: ^1.1.0
   freezed_annotation: ^3.1.0
-  json_annotation: ^4.11.0
+  json_annotation: ^4.12.0
 
   # Discover swipe deck
   flutter_card_swiper: ^7.0.1
@@ -81,9 +81,9 @@ dev_dependencies:
 
   flutter_lints: ^6.0.0
   build_runner: ^2.15.0
-  riverpod_generator: ^4.0.3
-  freezed: ^3.2.5
-  json_serializable: ^6.13.0
+  riverpod_generator: ^4.0.4-dev.1
+  freezed: ^3.2.6-dev.1
+  json_serializable: ^6.14.0
   flutter_launcher_icons: ^0.14.4
 
 flutter_launcher_icons:
